@@ -1,7 +1,24 @@
-import React from "react"
+import { TaskStatus } from "@/components/dashboard/TaskStatus"
+import TaskStatusSkeleton from "@/components/tasks/TaskStatusSkeleton"
 
-const DashboardPage = () => {
-  return <div>DashboardPage</div>
+import { Suspense } from "react"
+
+const DashboardPage = async () => {
+  
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <p className="mt-1 text-muted-foreground">
+          Manage and track your tasks efficiently
+        </p>
+      </div>
+
+      <Suspense fallback={<TaskStatusSkeleton />}>
+        <TaskStatus />
+      </Suspense>
+    </div>
+  )
 }
 
 export default DashboardPage
