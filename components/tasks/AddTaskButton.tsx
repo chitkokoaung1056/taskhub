@@ -1,11 +1,11 @@
 "use client"
 
-import { Button } from "./ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-import TaskForm from "./TaskForm"
 import { createTaskAction } from "@/lib/actions/task.action"
+import { Button } from "../ui/button"
+import TaskForm from "./TaskForm"
 
 export function AddTaskButton() {
   const [open, setOpen] = useState(false)

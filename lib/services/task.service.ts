@@ -1,6 +1,11 @@
 // lib/services/taskService.ts
 import { createClient } from "@/lib/supabase/server"
-import { TaskServiceResponseType, TaskStatsType, TaskType } from "@/types/task"
+import {
+  FilterOptionType,
+  TaskServiceResponseType,
+  TaskStatsType,
+  TaskType,
+} from "@/types/task"
 
 export async function getTaskStats(): Promise<
   TaskServiceResponseType<TaskStatsType>
@@ -44,6 +49,48 @@ export async function getTaskStats(): Promise<
       pending,
       overdue,
     },
+    error: null,
+  }
+}
+
+export async function getTaskCount(
+  filter: FilterOptionType
+): Promise<TaskServiceResponseType<number>> {
+  const supabase = await createClient()
+
+  let query = supabase.from("tasks").select("*", { count: "exact", head: true })
+
+  switch (filter) {
+    case "completed":
+      query = query.eq("status", "completed")
+      break
+
+    case "pending":
+      query = query.eq("status", "pending")
+      break
+
+    case "high":
+    case "medium":
+    case "low":
+      query = query.eq("priority", filter)
+      break
+
+    case "all":
+    default:
+      break
+  }
+
+  const { count, error } = await query
+
+  if (error) {
+    return {
+      data: null,
+      error: new Error(error.message),
+    }
+  }
+
+  return {
+    data: count ?? 0,
     error: null,
   }
 }

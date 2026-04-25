@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { EditTask } from "./EditTask"
 import { TaskType } from "./CreateTask"
 

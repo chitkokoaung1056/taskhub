@@ -1,6 +1,15 @@
-import { AddTaskButton } from "@/components/AddTaskButton"
+import { AddTaskButton } from "@/components/tasks/AddTaskButton"
+import TaskTitleSkeleton from "@/components/tasks/skeleton/TaskTitleSkeleton"
+import TaskFilter from "@/components/tasks/TaskFilter"
+import TaskTitle from "@/components/tasks/TaskTitle"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { Suspense } from "react"
 
-export default function TaskPage() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -16,19 +25,18 @@ export default function TaskPage() {
         </div>
       </div>
 
-      {/* Filters and Sorting 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <CardTitle>All Tasks ({filteredAndSortedTasks.length})</CardTitle>
-            <TaskFilters
-              sortBy={sortBy}
-              filterBy={filterBy}
-              onSortChange={setSortBy}
-              onFilterChange={setFilterBy}
-            />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <Suspense fallback={<TaskTitleSkeleton />}>
+              <TaskTitle searchParams={searchParams} />
+            </Suspense>
+            <Suspense fallback={<span />}>
+              <TaskFilter />
+            </Suspense>
           </div>
         </CardHeader>
+        {/* Filters and Sorting 
         <CardContent>
           {filteredAndSortedTasks.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
@@ -47,9 +55,9 @@ export default function TaskPage() {
               ))}
             </div>
           )}
-        </CardContent>
+        </CardContent>*/}
       </Card>
-
+      {/*
       <EditTaskDialog
         task={editingTask}
         isOpen={editingTask !== null}

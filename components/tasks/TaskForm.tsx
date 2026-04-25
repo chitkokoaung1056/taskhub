@@ -22,7 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
+import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 
 import { TaskActionStateType } from "@/types/action.type"
 import { toast } from "sonner"

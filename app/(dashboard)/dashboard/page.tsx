@@ -1,10 +1,9 @@
 import { TaskStatus } from "@/components/dashboard/TaskStatus"
-import TaskStatusSkeleton from "@/components/tasks/TaskStatusSkeleton"
+import TaskStatusSkeleton from "@/components/dashboard/skeleton/TaskStatusSkeleton"
 
 import { Suspense } from "react"
 
 const DashboardPage = async () => {
-  
   return (
     <div className="space-y-6">
       <div>
