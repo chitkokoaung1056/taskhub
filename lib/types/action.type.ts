@@ -1,5 +1,4 @@
 // types/action.types.ts
-import { TaskType } from "./task"
 
 export type TaskActionErrorType = {
   task_name?: string[]
@@ -10,9 +9,17 @@ export type TaskActionErrorType = {
   general?: string[] // For Supabase/server errors
 }
 
+export type TaskActionValuesType = {
+  task_name?: string
+  task_description?: string
+  priority?: "high" | "medium" | "low"
+  status?: "completed" | "pending"
+  due_date?: string
+}
+
 export type TaskActionStateType = {
   success?: boolean
   errors?: TaskActionErrorType
   message?: string[] // For success messages
-  task?: TaskType | null
+  values?: Partial<TaskActionValuesType> // For returning validated values if needed
 }

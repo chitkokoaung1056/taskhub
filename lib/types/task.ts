@@ -5,10 +5,10 @@ export type TaskType = {
   priority: "high" | "medium" | "low"
   due_date: string
   status: "completed" | "pending"
-  created_at: string
+  created_at?: string
 }
 
-export type SortOptionType = "createdDate" | "dueDate" | "priority" | "status"
+export type SortOptionType = "created_at" | "due_date" | "priority" | "status"
 export type FilterOptionType = "all" | "completed" | "pending" | "high" | "medium" | "low"
 
 export type TaskServiceResponseType<T> = {

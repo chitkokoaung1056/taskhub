@@ -1,5 +1,5 @@
 // lib/mock/tasks.ts
-import { TaskType } from '@/types/task'
+import { TaskType } from '@/lib/types/task'
 
 // Helper to get dates relative to today
 const getDate = (daysFromNow: number): string => {

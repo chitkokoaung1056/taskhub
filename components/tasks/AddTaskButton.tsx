@@ -7,7 +7,7 @@ import { createTaskAction } from "@/lib/actions/task.action"
 import { Button } from "../ui/button"
 import TaskForm from "./TaskForm"
 
-export function AddTaskButton() {
+export default function AddTaskButton() {
   const [open, setOpen] = useState(false)
   const onClose = () => setOpen(false)
 

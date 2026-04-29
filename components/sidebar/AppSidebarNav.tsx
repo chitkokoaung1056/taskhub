@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar"
 
-import type { MenuItemType } from "@/types/navigation"
+import type { MenuItemType } from "@/lib/types/navigation"
 import { iconMap } from "./icon"
 
 const menuItems: MenuItemType[] = [

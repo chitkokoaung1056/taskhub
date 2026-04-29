@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
-import { useState, useActionState, useEffect, useRef } from "react"
+import { useState, useTransition } from "react"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 
@@ -24,8 +23,13 @@ import {
 } from "@/components/ui/popover"
 import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 
-import { TaskActionStateType } from "@/types/action.type"
+import {
+  TaskActionErrorType,
+  TaskActionStateType,
+  TaskActionValuesType,
+} from "@/lib/types/action.type"
 import { toast } from "sonner"
+import { TaskType } from "@/lib/types/task"
 
 const initialState: TaskActionStateType = {
   success: false,
@@ -42,52 +46,49 @@ type TaskFormProps = {
   onClose: () => void
   action: TaskAction
   formType: "edit" | "add"
-  task?: {
-    id?: string
-    task_name?: string
-    task_description?: string
-    priority?: string
-    status?: string
-    due_date?: string
-  }
+  task?: TaskType
 }
 
-export default function TaskForm({ onClose, action, formType, task }: TaskFormProps) {
-  const [state, formAction, isPending] = useActionState(action, initialState)
+export default function TaskForm({
+  onClose,
+  action,
+  formType,
+  task,
+}: TaskFormProps) {
+  const [isPending, startTransition] = useTransition()
 
   const [date, setDate] = useState<Date | undefined>(
-    formType === "edit" && task?.due_date 
-      ? new Date(task.due_date) 
-      : undefined
+    formType === "edit" && task?.due_date ? new Date(task.due_date) : undefined
   )
-  const [errors, setErrors] = useState(state.errors ?? {})
 
-  const prevSuccess = useRef(false)
-
-  useEffect(() => {
-    if (!state.success && state.errors) {
-      setErrors(state.errors)
-    }
-
-    if (state.success && !prevSuccess.current) {
-      setDate(undefined)
-      setErrors({})
-
-      toast.success(state.message)
-
-      setTimeout(() => {
-        onClose()
-      }, 100)
-    }
-
-    prevSuccess.current = state.success!
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state])
+  const [errors, setErrors] = useState<TaskActionErrorType>({})
+  const [formValues, setFormValues] = useState<TaskActionValuesType>({})
 
   const handleCancel = () => {
-    setErrors({})
     setDate(undefined)
+    setErrors({})
+    setFormValues({})
     onClose()
+  }
+
+  const handleSubmit = async (formData: FormData) => {
+    setErrors({})
+    setFormValues({})
+    startTransition(async () => {
+      const result = await action(initialState, formData)
+
+      if (result.success && result.message) {
+        toast.success(result.message?.[0])
+        handleCancel()
+      } else if (!result.success && result.errors?.general) {
+        toast.error(result.errors?.general[0])
+      }
+
+      if (!result.success && result.errors) {
+        setErrors(result.errors || {})
+        setFormValues(result.values || {})
+      }
+    })
   }
 
   return (
@@ -98,17 +99,19 @@ export default function TaskForm({ onClose, action, formType, task }: TaskFormPr
         </DialogTitle>
       </DialogHeader>
 
-      <form action={formAction} className="mt-2 space-y-5">
+      <form action={handleSubmit} className="mt-2 space-y-5">
         {/* Hidden field for edit mode */}
         {formType === "edit" && task?.id && (
-          <input type="hidden" name="task_id" value={task.id} />
+          <input type="hidden" name="id" value={task.id} />
         )}
 
         <div className="space-y-2">
           <Label>Task Name</Label>
-          <Input 
-            name="task_name" 
-            defaultValue={formType === "edit" ? task?.task_name : ""}
+          <Input
+            name="task_name"
+            defaultValue={
+              formType === "edit" ? task?.task_name : formValues.task_name
+            }
           />
           {errors.task_name && (
             <p className="text-sm text-destructive">{errors.task_name[0]}</p>
@@ -117,9 +120,13 @@ export default function TaskForm({ onClose, action, formType, task }: TaskFormPr
 
         <div className="space-y-2">
           <Label>Description</Label>
-          <Textarea 
-            name="task_description" 
-            defaultValue={formType === "edit" ? task?.task_description : ""}
+          <Textarea
+            name="task_description"
+            defaultValue={
+              formType === "edit"
+                ? task?.task_description
+                : formValues.task_description
+            }
           />
           {errors.task_description && (
             <p className="text-sm text-destructive">
@@ -131,9 +138,11 @@ export default function TaskForm({ onClose, action, formType, task }: TaskFormPr
         <div className="flex flex-col gap-4 md:flex-row">
           <div className="w-full space-y-2">
             <Label>Priority</Label>
-            <Select 
-              name="priority" 
-              defaultValue={formType === "edit" ? task?.priority || "medium" : "medium"}
+            <Select
+              name="priority"
+              defaultValue={
+                formType === "edit" ? task?.priority || "medium" : "medium"
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -148,9 +157,13 @@ export default function TaskForm({ onClose, action, formType, task }: TaskFormPr
 
           <div className="w-full space-y-2">
             <Label>Status</Label>
-            <Select 
-              name="status" 
-              defaultValue={formType === "edit" ? task?.status || "pending" : "pending"}
+            <Select
+              name="status"
+              defaultValue={
+                formType === "edit"
+                  ? task?.status || "pending"
+                  : formValues.status || "pending"
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -195,7 +208,12 @@ export default function TaskForm({ onClose, action, formType, task }: TaskFormPr
         </div>
 
         <div className="flex gap-3">
-          <Button type="button" variant="outline" onClick={handleCancel}>
+          <Button
+            type="button"
+            variant="outline"
+            className="cursor-pointer"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
 
@@ -204,10 +222,13 @@ export default function TaskForm({ onClose, action, formType, task }: TaskFormPr
             disabled={isPending}
             className={`${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
           >
-            {isPending 
-              ? (formType === "add" ? "Creating..." : "Saving...")
-              : (formType === "add" ? "Create Task" : "Save Changes")
-            }
+            {isPending
+              ? formType === "add"
+                ? "Creating..."
+                : "Saving..."
+              : formType === "add"
+                ? "Create Task"
+                : "Save Changes"}
           </Button>
         </div>
       </form>

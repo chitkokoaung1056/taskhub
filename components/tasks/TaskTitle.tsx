@@ -1,6 +1,6 @@
 import { getTaskCount } from "@/lib/services/task.service"
 import { CardDescription, CardTitle } from "../ui/card"
-import { FilterOptionType } from "@/types/task"
+import { FilterOptionType } from "@/lib/types/task"
 
 const TITLE_MAP: Record<FilterOptionType, string> = {
   all: "All Tasks",

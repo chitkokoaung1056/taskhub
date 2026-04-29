@@ -9,7 +9,7 @@ import {
   Select,
 } from "../ui/select"
 import { ArrowUpDown, Filter } from "lucide-react"
-import { FilterOptionType, SortOptionType } from "@/types/task"
+import { FilterOptionType, SortOptionType } from "@/lib/types/task"
 
 const TaskFilter = () => {
   const searchParams = useSearchParams()
@@ -17,14 +17,14 @@ const TaskFilter = () => {
   const { replace } = useRouter()
 
   const currentSortBy =
-    (searchParams.get("sort") as SortOptionType) || "createdDate"
+    (searchParams.get("sort") as SortOptionType) || "created_at"
   const currentFilterBy =
     (searchParams.get("filter") as FilterOptionType) || "all"
 
   const updateSort = (value: SortOptionType) => {
     const params = new URLSearchParams(searchParams)
 
-    if (value !== "createdDate") params.set("sort", value)
+    if (value !== "created_at") params.set("sort", value)
     else params.delete("sort")
 
     replace(`${pathname}?${params.toString()}`)
@@ -51,8 +51,8 @@ const TaskFilter = () => {
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="createdDate">Created Date (Newest)</SelectItem>
-          <SelectItem value="dueDate">Due Date</SelectItem>
+          <SelectItem value="created_at">Created Date (Newest)</SelectItem>
+          <SelectItem value="due_date">Due Date</SelectItem>
           <SelectItem value="priority">Priority</SelectItem>
           <SelectItem value="status">Status</SelectItem>
         </SelectContent>
