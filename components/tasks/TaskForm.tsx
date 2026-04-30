@@ -27,7 +27,7 @@ import {
   TaskActionErrorType,
   TaskActionStateType,
   TaskActionValuesType,
-} from "@/lib/types/action.type"
+} from "@/lib/types/actionTypes/task.actionType"
 import { toast } from "sonner"
 import { TaskType } from "@/lib/types/task"
 

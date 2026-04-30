@@ -3,9 +3,9 @@
 import { TaskType } from "@/lib/types/task"
 import { taskSchema } from "../schemas/task.schema"
 import z from "zod"
-import { TaskActionStateType } from "@/lib/types/action.type"
 import { createTask, deleteTask, updateTask } from "../services/task.service"
 import { revalidatePath } from "next/cache"
+import { TaskActionStateType } from "../types/actionTypes/task.actionType"
 
 export async function createTaskAction(
   prevState: TaskActionStateType,

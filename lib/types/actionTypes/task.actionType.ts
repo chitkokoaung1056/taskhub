@@ -1,4 +1,3 @@
-// types/action.types.ts
 
 export type TaskActionErrorType = {
   task_name?: string[]
