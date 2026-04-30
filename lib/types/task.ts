@@ -6,6 +6,7 @@ export type TaskType = {
   due_date: string
   status: "completed" | "pending"
   created_at?: string
+  user_id?: string
 }
 
 export type SortOptionType = "created_at" | "due_date" | "priority" | "status"
