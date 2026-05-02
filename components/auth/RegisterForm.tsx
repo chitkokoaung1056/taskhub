@@ -17,16 +17,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { registerUserAction } from "@/lib/actions/auth.action"
 import {
-  AuthActionErrorType,
-  AuthActionStateType,
-  AuthActionValuesType,
+  RegisterActionStateType,
+  RegisterErrorsType,
+  RegisterValuesType,
 } from "@/lib/types/actionTypes/auth.actionType"
+
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
-const initialState: AuthActionStateType = {
+const initialState: RegisterActionStateType = {
   success: false,
   errors: {},
   message: [],
@@ -36,27 +37,32 @@ export default function RegisterForm({
   ...props
 }: React.ComponentProps<typeof Card>) {
   const [isPending, startTransition] = useTransition()
-  const [errors, setErrors] = useState<AuthActionErrorType>({})
-  const [formValues, setFormValues] = useState<AuthActionValuesType>({})
+  const [errors, setErrors] = useState<RegisterErrorsType>({})
+  const [formValues, setFormValues] = useState<RegisterValuesType>({})
   const router = useRouter()
 
-  const clearError = (field: keyof AuthActionErrorType) => {
+  const clearError = (field: keyof RegisterErrorsType) => {
     setErrors((prev) => ({ ...prev, [field]: undefined }))
+  }
+
+  const clearAll = () => {
+    setErrors({})
+    setFormValues({})
   }
 
   const handleRegister = async (formData: FormData) => {
     setErrors({})
     setFormValues({})
+
     startTransition(async () => {
+      clearAll()
       const result = await registerUserAction(initialState, formData)
 
       if (result.success && result.message) {
         toast.success(result.message[0])
-        setFormValues({})
-        router.replace("/login")
+        router.push(result.redirectTo!)
       } else if (!result.success && result.errors?.general) {
         toast.error(result.errors.general[0])
-        setFormValues({})
       }
 
       if (!result.success && result.errors) {
@@ -74,10 +80,10 @@ export default function RegisterForm({
       {/* HEADER */}
       <CardHeader className="mb-6 space-y-2 text-center">
         <CardTitle className="text-2xl font-semibold tracking-tight">
-          Create your account
+          Create account
         </CardTitle>
         <CardDescription className="text-sm">
-          Join us and start managing your tasks smarter 🚀
+          Start managing your tasks smarter
         </CardDescription>
       </CardHeader>
 
@@ -85,6 +91,44 @@ export default function RegisterForm({
       <CardContent>
         <form action={handleRegister} className="space-y-6">
           <FieldGroup className="space-y-5">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* FIRST NAME */}
+              <Field>
+                <FieldLabel htmlFor="first_name">First name</FieldLabel>
+                <Input
+                  id="first_name"
+                  name="first_name"
+                  placeholder="John"
+                  className="mt-2 transition focus-visible:ring-2"
+                  defaultValue={formValues.first_name}
+                  onChange={() => clearError("first_name")}
+                />
+                {errors.first_name && (
+                  <FieldDescription className="mt-1 text-xs text-destructive">
+                    {errors.first_name[0]}
+                  </FieldDescription>
+                )}
+              </Field>
+
+              {/* LAST NAME */}
+              <Field>
+                <FieldLabel htmlFor="last_name">Last name</FieldLabel>
+                <Input
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Doe"
+                  className="mt-2 transition focus-visible:ring-2"
+                  defaultValue={formValues.last_name}
+                  onChange={() => clearError("last_name")}
+                />
+                {errors.last_name && (
+                  <FieldDescription className="mt-1 text-xs text-destructive">
+                    {errors.last_name[0]}
+                  </FieldDescription>
+                )}
+              </Field>
+            </div>
+
             {/* EMAIL */}
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -148,15 +192,18 @@ export default function RegisterForm({
           <Button
             type="submit"
             disabled={isPending}
-            className={`h-11 w-full text-sm font-medium transition-all duration-200 ${isPending ? "cursor-not-allowed opacity-70" : ""}`}
+            className={`h-11 w-full text-sm font-medium transition-all duration-200 ${
+              isPending ? "cursor-not-allowed opacity-70" : ""
+            }`}
           >
-            {isPending ? "Creating account..." : "Create Account"}
+            {isPending ? "Creating account..." : "Create account"}
           </Button>
 
           {/* FOOTER */}
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
+              onClick={clearAll}
               replace
               aria-disabled={isPending}
               href="/login"

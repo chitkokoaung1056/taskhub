@@ -12,11 +12,6 @@ export type TaskType = {
 export type SortOptionType = "created_at" | "due_date" | "priority" | "status"
 export type FilterOptionType = "all" | "completed" | "pending" | "high" | "medium" | "low"
 
-export type TaskServiceResponseType<T> = {
-  data?: T | null
-  error: Error | null
-}
-
 export type TaskStatsType = {
   total: number
   completed: number

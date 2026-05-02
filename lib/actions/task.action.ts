@@ -6,7 +6,6 @@ import z from "zod"
 import { createTask, deleteTask, updateTask } from "../services/task.service"
 import { revalidatePath } from "next/cache"
 import { TaskActionStateType } from "../types/actionTypes/task.actionType"
-
 export async function createTaskAction(
   prevState: TaskActionStateType,
   formData: FormData
@@ -23,39 +22,35 @@ export async function createTaskAction(
 
   if (!validationResult.success) {
     const { fieldErrors } = z.flattenError(validationResult.error)
+
     return {
       success: false,
       errors: fieldErrors,
-      values: rawData
+      values: rawData,
     }
   }
 
-  const validatedData = validationResult.data
-  const newTask: TaskType = {
-    task_name: validatedData.task_name,
-    task_description: validatedData.task_description,
-    priority: validatedData.priority,
-    due_date: validatedData.due_date,
-    status: validatedData.status,
-  }
+  try {
+    const data = validationResult.data
 
-  const { error } = await createTask(newTask)
+    await createTask(data as TaskType)
 
-  if (error) {
+    revalidatePath("/task")
+
+    return {
+      success: true,
+      message: ["Task created successfully!"],
+      errors: {},
+      values: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
-      message: [],
+      values: rawData,
     }
-  }
-  revalidatePath("/task")
-
-  return {
-    success: true,
-    errors: {},
-    message: ["Task created successfully!"],
   }
 }
 
@@ -90,53 +85,53 @@ export async function updateTaskAction(
 
     return {
       success: false,
-      errors: {
-        task_name: fieldErrors.task_name,
-        task_description: fieldErrors.task_description,
-        priority: fieldErrors.priority,
-        status: fieldErrors.status,
-        due_date: fieldErrors.due_date,
-      },
+      errors: fieldErrors,
+      values: rawData,
     }
   }
 
-  const { error } = await updateTask(taskId, validationResult.data)
+  try {
+    await updateTask(taskId, validationResult.data)
 
-  if (error) {
+    revalidatePath("/task")
+
+    return {
+      success: true,
+      message: ["Task updated successfully!"],
+      errors: {},
+      values: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
+      values: rawData,
     }
-  }
-
-  revalidatePath("/task")
-
-  return {
-    success: true,
-    errors: {},
-    message: ["Task updated successfully!"],
   }
 }
 
-export async function deleteTaskAction(id: number) {
-  const { error } = await deleteTask(id)
+export async function deleteTaskAction(
+  id: number
+): Promise<TaskActionStateType> {
+  try {
+    await deleteTask(id)
 
-  if (error) {
+    revalidatePath("/task")
+
+    return {
+      success: true,
+      message: ["Task deleted successfully"],
+      errors: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
     }
-  }
-
-  revalidatePath("/task")
-
-  return {
-    success: true,
-    message: ["Task deleted successfully"],
   }
 }
 
@@ -144,24 +139,24 @@ export async function toggleTaskStatusAction(
   id: number,
   currentStatus: "completed" | "pending"
 ): Promise<TaskActionStateType> {
-  const { error } = await updateTask(id, {
-    status: currentStatus === "completed" ? "pending" : "completed",
-  })
+  try {
+    await updateTask(id, {
+      status: currentStatus === "completed" ? "pending" : "completed",
+    })
 
-  if (error) {
+    revalidatePath("/task")
+
+    return {
+      success: true,
+      message: ["Status updated"],
+      errors: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
     }
-  }
-
-  revalidatePath("/task")
-
-  return {
-    success: true,
-    errors: {},
-    message: ["Status updated"],
   }
 }

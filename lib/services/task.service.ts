@@ -3,125 +3,92 @@ import { createClient } from "@/lib/supabase/server"
 import {
   FilterOptionType,
   SortOptionType,
-  TaskServiceResponseType,
   TaskStatsType,
   TaskType,
 } from "../types/task"
-
-export async function getTaskStats(): Promise<
-  TaskServiceResponseType<TaskStatsType>
-> {
+export async function getTaskStats(): Promise<TaskStatsType> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
     .from("tasks")
     .select("status, due_date")
 
-  if (error) {
-    return { data: null, error: new Error(error.message) }
-  }
+  if (error) throw new Error(error.message)
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  let completed = 0,
-    pending = 0,
-    overdue = 0
+  let completed = 0
+  let pending = 0
+  let overdue = 0
 
   for (const t of data ?? []) {
-    switch (t.status) {
-      case "completed":
-        completed++
-        break
+    if (t.status === "completed") {
+      completed++
+    }
 
-      case "pending":
-        pending++
-        if (t.due_date && new Date(t.due_date) < today) {
-          overdue++
-        }
-        break
+    if (t.status === "pending") {
+      pending++
+
+      if (t.due_date && new Date(t.due_date) < today) {
+        overdue++
+      }
     }
   }
 
   return {
-    data: {
-      total: data?.length ?? 0,
-      completed,
-      pending,
-      overdue,
-    },
-    error: null,
+    total: data?.length ?? 0,
+    completed,
+    pending,
+    overdue,
   }
 }
 
-export async function getTaskCount(
-  filter: FilterOptionType
-): Promise<TaskServiceResponseType<number>> {
+export async function getTaskCount(filter: FilterOptionType): Promise<number> {
   const supabase = await createClient()
 
   let query = supabase.from("tasks").select("*", { count: "exact", head: true })
 
-  switch (filter) {
-    case "completed":
-      query = query.eq("status", "completed")
-      break
+  if (filter === "completed") {
+    query = query.eq("status", "completed")
+  }
 
-    case "pending":
-      query = query.eq("status", "pending")
-      break
+  if (filter === "pending") {
+    query = query.eq("status", "pending")
+  }
 
-    case "high":
-    case "medium":
-    case "low":
-      query = query.eq("priority", filter)
-      break
-
-    case "all":
-    default:
-      break
+  if (["high", "medium", "low"].includes(filter)) {
+    query = query.eq("priority", filter)
   }
 
   const { count, error } = await query
 
-  if (error) {
-    return {
-      data: null,
-      error: new Error(error.message),
-    }
-  }
+  if (error) throw new Error(error.message)
 
-  return {
-    data: count ?? 0,
-    error: null,
-  }
+  return count ?? 0
 }
 
-export async function createTask(
-  task: TaskType
-): Promise<TaskServiceResponseType<TaskType>> {
+export async function createTask(task: TaskType) {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("tasks")
-    .insert([task])
+    .insert(task)
     .select()
     .single()
 
-  if (error) {
-    return { error: new Error(error.message) }
-  }
+  if (error) throw new Error(error.message)
 
-  return {
-    error: null,
-  }
+  if (!data) throw new Error("Task creation failed")
 }
 
 export async function getTasks(
   search?: string,
   filter?: FilterOptionType,
   sort?: SortOptionType
-): Promise<TaskServiceResponseType<TaskType[]>> {
+): Promise<TaskType[]> {
   const supabase = await createClient()
+
   let query = supabase.from("tasks").select("*")
 
   if (search) {
@@ -138,14 +105,12 @@ export async function getTasks(
     }
   }
 
-  /* ---------------- SORT ---------------- */
   switch (sort) {
     case "due_date":
       query = query.order("due_date", { ascending: true })
       break
 
     case "priority":
-      // high → low (custom logic handled client-side OR DB enum order)
       query = query.order("priority", { ascending: true })
       break
 
@@ -159,23 +124,12 @@ export async function getTasks(
 
   const { data, error } = await query
 
-  if (error) {
-    return {
-      data: null,
-      error: new Error(error.message),
-    }
-  }
+  if (error) throw new Error(error.message)
 
-  return {
-    data: data ?? [],
-    error: null,
-  }
+  return data ?? []
 }
 
-export async function updateTask(
-  id: number,
-  updates: Partial<TaskType>
-): Promise<TaskServiceResponseType<TaskType>> {
+export async function updateTask(id: number, updates: Partial<TaskType>) {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -185,17 +139,9 @@ export async function updateTask(
     .select()
     .single()
 
-  if (error) {
-    return {
-      data: null,
-      error: new Error(error.message),
-    }
-  }
+  if (error) throw new Error(error.message)
 
-  return {
-    data,
-    error: null,
-  }
+  if (!data) throw new Error("Task not found")
 }
 
 export async function deleteTask(id: number) {
@@ -203,9 +149,5 @@ export async function deleteTask(id: number) {
 
   const { error } = await supabase.from("tasks").delete().eq("id", id)
 
-  if (error) {
-    return { error: new Error(error.message) }
-  }
-
-  return { error: null }
+  if (error) throw new Error(error.message)
 }

@@ -22,13 +22,13 @@ const TaskTitle = async ({
 
   const filter = (params.filter as FilterOptionType) || "all"
 
-  const { data, error } = await getTaskCount(filter)
+  const data = await getTaskCount(filter)
 
   const title = TITLE_MAP[filter]
 
   return (
     <CardTitle>
-      {!error ? `${title} ` : "Tasks"}
+      {title}
       <CardDescription className="inline-block">({data})</CardDescription>
     </CardTitle>
   )

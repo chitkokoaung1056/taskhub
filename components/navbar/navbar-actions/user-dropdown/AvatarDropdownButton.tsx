@@ -1,26 +1,24 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ProfileType } from "@/lib/types/profile"
 import { getInitials } from "@/lib/utils"
+import { User } from "@supabase/supabase-js"
 
-async function getUser() {
-  // replace with Supabase / DB call later
-  return {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
-  }
+type Props = {
+  user: Promise<User>
+  profile: Promise<ProfileType>
 }
 
-const AvatarDropdownButton = async () => {
-  const user = await getUser()
-  const initials = getInitials(user.name)
+export default async function AvatarDropdownButton({ user, profile }: Props) {
+  const currentUser = await user
+  const currentProfile = await profile
+
+  const { first_name, last_name } = currentProfile
+  const initials = getInitials(first_name, last_name)
 
   return (
     <Avatar className="size-8">
-      <AvatarImage src={user.avatar} />
+      <AvatarImage src="" />
       <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
   )
 }
-
-export default AvatarDropdownButton

@@ -7,9 +7,9 @@ import {
 import { getTaskStats } from "@/lib/services/task.service"
 
 export const TaskStatus = async () => {
-  const { data } = await getTaskStats()
+  const data = await getTaskStats()
 
-  const { total, completed, pending, overdue } = data!
+  const { total, completed, pending, overdue } = data
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

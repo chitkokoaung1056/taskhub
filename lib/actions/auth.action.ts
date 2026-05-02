@@ -2,23 +2,30 @@
 
 import z from "zod"
 import { loginUser, logoutUser, registerUser } from "../services/auth.service"
-import { AuthActionStateType } from "../types/actionTypes/auth.actionType"
+import {
+  LoginActionStateType,
+  LogoutActionStateType,
+  RegisterActionStateType,
+} from "../types/actionTypes/auth.actionType"
 import { loginSchema, registerSchema } from "../schemas/auth.schema"
 
 export async function registerUserAction(
-  prevState: AuthActionStateType,
+  prevState: RegisterActionStateType,
   formData: FormData
-): Promise<AuthActionStateType> {
+): Promise<RegisterActionStateType> {
   const rawData = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
     confirmPassword: formData.get("confirmPassword") as string,
+    first_name: formData.get("first_name") as string,
+    last_name: formData.get("last_name") as string,
   }
 
   const validationResult = registerSchema.safeParse(rawData)
 
   if (!validationResult.success) {
     const { fieldErrors } = z.flattenError(validationResult.error)
+
     return {
       success: false,
       errors: fieldErrors,
@@ -26,34 +33,38 @@ export async function registerUserAction(
     }
   }
 
-  const validatedData = validationResult.data
-  const newUser = {
-    email: validatedData.email,
-    password: validatedData.password,
-  }
-  const { error } = await registerUser(newUser)
+  try {
+    const validatedData = validationResult.data
 
-  if (error) {
+    await registerUser({
+      email: validatedData.email,
+      password: validatedData.password,
+      first_name: validatedData.first_name.trim(),
+      last_name: validatedData.last_name.trim(),
+    })
+
+    return {
+      success: true,
+      message: ["User registered successfully!"],
+      redirectTo: "/dashboard",
+      errors: {},
+      values: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
-      message: [],
+      values: rawData,
     }
-  }
-
-  return {
-    success: true,
-    errors: {},
-    message: ["User registered successfully!"],
   }
 }
 
 export async function loginUserAction(
-  prevState: AuthActionStateType,
+  prevState: LoginActionStateType,
   formData: FormData
-): Promise<AuthActionStateType> {
+): Promise<LoginActionStateType> {
   const rawData = {
     email: formData.get("email") as string,
     password: formData.get("password") as string,
@@ -63,6 +74,7 @@ export async function loginUserAction(
 
   if (!validationResult.success) {
     const { fieldErrors } = z.flattenError(validationResult.error)
+
     return {
       success: false,
       errors: fieldErrors,
@@ -70,47 +82,49 @@ export async function loginUserAction(
     }
   }
 
-  const validatedData = validationResult.data
-  const user = {
-    email: validatedData.email,
-    password: validatedData.password,
-  }
+  try {
+    const validatedData = validationResult.data
 
-  const { error } = await loginUser(user)
+    await loginUser({
+      email: validatedData.email,
+      password: validatedData.password,
+    })
 
-  if (error) {
+    return {
+      success: true,
+      message: ["Login successful!"],
+      redirectTo: "/dashboard",
+      errors: {},
+      values: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
-      message: [],
+      values: rawData,
     }
-  }
-
-  return {
-    success: true,
-    errors: {},
-    message: ["Login successful!"],
   }
 }
 
-export async function logoutUserAction(): Promise<AuthActionStateType> {
-  const { error } = await logoutUser()
+export async function logoutUserAction(): Promise<LogoutActionStateType> {
+  try {
+    await logoutUser()
 
-  if (error) {
+    return {
+      success: true,
+      message: ["Logged out successfully!"],
+      redirectTo: "/login",
+      errors: {},
+    }
+  } catch (err) {
     return {
       success: false,
       errors: {
-        general: [error.message],
+        general: [(err as Error).message],
       },
       message: [],
     }
-  }
-
-  return {
-    success: true,
-    errors: {},
-    message: ["Logged out successfully!"],
   }
 }

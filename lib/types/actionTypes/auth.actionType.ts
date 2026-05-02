@@ -1,19 +1,45 @@
-export type AuthActionErrorType = {
+import { LoginType, RegisterType } from "../auth"
+
+export type RegisterErrorsType = {
   email?: string[]
   password?: string[]
   confirmPassword?: string[]
-  general?: string[] // For Supabase/server errors
+  first_name?: string[]
+  last_name?: string[]
+  general?: string[]
 }
 
-export type AuthActionValuesType = {
-  email?: string
-  password?: string
-  confirmPassword?: string
-}
-
-export type AuthActionStateType = {
+export type RegisterActionStateType = {
   success?: boolean
-  errors?: AuthActionErrorType
+  errors?: RegisterErrorsType
+  values?: Partial<RegisterType>
   message?: string[]
-  values?: Partial<AuthActionValuesType>
+  redirectTo?: string
+}
+
+//login
+
+export type LoginErrorsType = {
+  email?: string[]
+  password?: string[]
+  general?: string[]
+}
+
+export type LoginActionStateType = {
+  success?: boolean
+  errors?: LoginErrorsType
+  values?: Partial<LoginType>
+  message?: string[]
+  redirectTo?: string
+}
+
+//logout
+
+export type LogoutActionStateType = {
+  success?: boolean
+  errors?: {
+    general?: string[]
+  }
+  message?: string[]
+  redirectTo?: string
 }

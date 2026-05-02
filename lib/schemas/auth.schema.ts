@@ -2,6 +2,16 @@ import { z } from "zod"
 
 export const registerSchema = z
   .object({
+    first_name: z
+      .string()
+      .min(1, "First name is required")
+      .min(2, "First name must be at least 2 characters"),
+
+    last_name: z
+      .string()
+      .min(1, "Last name is required")
+      .min(2, "Last name must be at least 2 characters"),
+
     email: z.email().min(1, "Email is required"),
 
     password: z
@@ -16,7 +26,7 @@ export const registerSchema = z
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"], 
+    path: ["confirmPassword"],
     message: "Passwords do not match",
   })
 

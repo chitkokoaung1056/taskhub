@@ -10,7 +10,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import AppSidebarNav from "./AppSidebarNav"
-import { SidebarUser } from "./SidebarUser"
+import { SidebarUserInfo } from "./SidebarUserInfo"
 import SidebarUserSkeleton from "./SidebarUserSkeleton"
 
 export async function AppSidebar() {
@@ -42,7 +42,7 @@ export async function AppSidebar() {
       <Separator />
       <SidebarFooter>
         <Suspense fallback={<SidebarUserSkeleton />}>
-          <SidebarUser />
+          <SidebarUserInfo />
         </Suspense>
       </SidebarFooter>
     </Sidebar>

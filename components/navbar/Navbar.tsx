@@ -1,5 +1,3 @@
-'use cache'
-
 import { SidebarTrigger } from "../ui/sidebar"
 import { Menu } from "lucide-react"
 import { SearchBar } from "./SearchBar"

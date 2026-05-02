@@ -17,15 +17,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { loginUserAction } from "@/lib/actions/auth.action"
 import {
-  AuthActionErrorType,
-  AuthActionStateType,
-  AuthActionValuesType,
+  LoginActionStateType,
+  LoginErrorsType,
+  LoginValuesType,
 } from "@/lib/types/actionTypes/auth.actionType"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
-const initialState: AuthActionStateType = {
+const initialState: LoginActionStateType = {
   success: false,
   errors: {},
   message: [],
@@ -35,25 +37,29 @@ export default function LoginForm({
   ...props
 }: React.ComponentProps<typeof Card>) {
   const [isPending, startTransition] = useTransition()
-  const [errors, setErrors] = useState<AuthActionErrorType>({})
-  const [formValues, setFormValues] = useState<AuthActionValuesType>({})
+  const [errors, setErrors] = useState<LoginErrorsType>({})
+  const [formValues, setFormValues] = useState<LoginValuesType>({})
+  const router = useRouter()
 
-  const clearError = (field: keyof AuthActionErrorType) => {
+  const clearError = (field: keyof LoginErrorsType) => {
     setErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
-  const handleLogin = async (formData: FormData) => {
+  const clearAll = () => {
     setErrors({})
     setFormValues({})
+  }
+
+  const handleLogin = async (formData: FormData) => {
+    clearAll()
     startTransition(async () => {
       const result = await loginUserAction(initialState, formData)
 
       if (result.success && result.message) {
         toast.success(result.message[0])
-        setFormValues({})
+        router.push(result.redirectTo!)
       } else if (!result.success && result.errors?.general) {
         toast.error(result.errors.general[0])
-        setFormValues({})
       }
 
       if (!result.success && result.errors) {
@@ -104,12 +110,12 @@ export default function LoginForm({
             <Field>
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Link
+                {/*<Link
                   href="/forgot-password"
                   className="text-xs text-muted-foreground hover:text-primary hover:underline"
                 >
                   Forgot password?
-                </Link>
+                </Link> */}
               </div>
 
               <Input
@@ -143,6 +149,7 @@ export default function LoginForm({
           <p className="text-center text-sm text-muted-foreground">
             Don’t have an account?{" "}
             <Link
+              onClick={clearAll}
               replace
               aria-disabled={isPending}
               href="/register"

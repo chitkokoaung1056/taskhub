@@ -1,22 +1,26 @@
 import { DropdownMenuLabel } from "@/components/ui/dropdown-menu"
 
-async function getUser() {
-  // replace with Supabase / DB call later
-  return {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
-  }
+import { ProfileType } from "@/lib/types/profile"
+import { User } from "@supabase/supabase-js"
+
+type Props = {
+  user: Promise<User>
+  profile: Promise<ProfileType>
 }
 
-const UserInfo = async () => {
-  const user = await getUser()
+const UserInfo = async ({ user, profile }: Props) => {
+  const currentUser = await user
+  const currentProfile = await profile
+
+  const { first_name, last_name } = currentProfile
+  const { email } = currentUser
 
   return (
     <DropdownMenuLabel>
-      <p className="text-sm font-medium">{user.name}</p>
-      <p className="text-xs text-muted-foreground">{user.email}</p>
+      <p className="text-sm font-medium">
+        {first_name} {last_name}
+      </p>
+      <p className="text-xs text-muted-foreground">{email}</p>
     </DropdownMenuLabel>
   )
 }

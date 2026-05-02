@@ -1,5 +1,3 @@
-"use cache"
-
 import Link from "next/link"
 
 import {
@@ -10,19 +8,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { UserCircle, Settings, LogOut } from "lucide-react"
-import AvatarDropdownButton from "./AvatarDropdownButton"
+import { Settings } from "lucide-react"
 import UserInfo from "./UserInfo"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
+import LogoutButton from "./LogoutButton"
+import { getCurrentUser } from "@/lib/services/auth.service"
+import { getProfile } from "@/lib/services/profile.service"
+import AvatarDropdownButton from "./AvatarDropdownButton"
 
 export async function UserDropdown() {
+  const profile = getProfile()
+  const user = getCurrentUser()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1 transition outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
           <Suspense fallback={<Skeleton className="size-8 rounded-full" />}>
-            <AvatarDropdownButton />
+            <AvatarDropdownButton profile={profile} user={user} />
           </Suspense>
         </button>
       </DropdownMenuTrigger>
@@ -37,17 +41,9 @@ export async function UserDropdown() {
             </div>
           }
         >
-          <UserInfo />
+          <UserInfo profile={profile} user={user} />
         </Suspense>
         <DropdownMenuSeparator />
-
-        {/* Profile */}
-        <DropdownMenuItem asChild>
-          <Link href="/profile" className="flex cursor-pointer items-center">
-            <UserCircle className="mr-2 size-4" />
-            Profile
-          </Link>
-        </DropdownMenuItem>
 
         {/* Settings */}
         <DropdownMenuItem asChild>
@@ -60,10 +56,7 @@ export async function UserDropdown() {
         <DropdownMenuSeparator />
 
         {/* Logout */}
-        <DropdownMenuItem className="cursor-pointer">
-          <LogOut className="mr-2 size-4" />
-          Logout
-        </DropdownMenuItem>
+        <LogoutButton />
       </DropdownMenuContent>
     </DropdownMenu>
   )

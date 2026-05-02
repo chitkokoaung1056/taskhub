@@ -18,7 +18,7 @@ const TaskGrid = async ({ searchParams }: TaskGridProps) => {
   const filter = (params.filter as FilterOptionType) || "all"
   const sort = (params.sort as SortOptionType) || "createdDate"
 
-  const { data: tasks } = await getTasks(search, filter, sort)
+  const tasks = await getTasks(search, filter, sort)
 
   return (
     <CardContent>

@@ -5,12 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function getInitials(name: string) {
-  const initials = name
-    .split(" ")
-    .map((n: string) => n[0])
-    .join("")
-    .slice(0, 2)
+export function getInitials(first_name: string, last_name: string) {
+  const initials = `${first_name[0]}${last_name[0]}`
 
   return initials
 }
