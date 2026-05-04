@@ -1,5 +1,5 @@
-import Navbar from "@/components/navbar/Navbar"
-import { AppSidebar } from "@/components/sidebar/AppSidebar"
+import Navbar from "@/components/dashboard-layout/navbar/Navbar"
+import { AppSidebar } from "@/components/dashboard-layout/sidebar/AppSidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 
 export default function Layout({ children }: { children: React.ReactNode }) {

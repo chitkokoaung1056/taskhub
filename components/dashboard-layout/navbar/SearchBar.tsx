@@ -1,8 +1,8 @@
 "use client"
 
 import { Search } from "lucide-react"
-import { Input } from "../ui/input"
-import { Button } from "../ui/button"
+import { Input } from "../../ui/input"
+import { Button } from "../../ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog"
+} from "../../ui/dialog"
 
 export function SearchBar() {
   const searchParams = useSearchParams()

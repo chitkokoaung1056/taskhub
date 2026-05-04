@@ -1,5 +1,6 @@
 import { ProfileType } from "../types/profile"
 import { createClient } from "../supabase/server"
+import { getCurrentUser } from "./auth.service"
 
 export async function getProfile(): Promise<ProfileType> {
   const supabase = await createClient()
@@ -17,12 +18,26 @@ export async function getProfile(): Promise<ProfileType> {
   return data
 }
 
-export async function createProfile(profile: ProfileType) {
+export async function updateProfile(
+  profile: Partial<ProfileType>
+): Promise<ProfileType> {
   const supabase = await createClient()
+  const user = await getCurrentUser()
 
-  const { error } = await supabase.from("profiles").insert(profile)
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(profile)
+    .eq("id", user.id)
+    .select()
+    .single()
 
   if (error) {
     throw new Error(error.message)
   }
+
+  if (!data) {
+    throw new Error("Profile not exist!!")
+  }
+
+  return data
 }

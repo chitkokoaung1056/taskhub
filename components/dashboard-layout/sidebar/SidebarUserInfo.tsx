@@ -1,6 +1,6 @@
 import { getInitials } from "@/lib/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { SidebarMenu, SidebarMenuItem } from "../ui/sidebar"
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
+import { SidebarMenu, SidebarMenuItem } from "../../ui/sidebar"
 import { getProfile } from "@/lib/services/profile.service"
 import { getCurrentUser } from "@/lib/services/auth.service"
 
@@ -8,7 +8,7 @@ export async function SidebarUserInfo() {
   const profile = await getProfile()
   const email = (await getCurrentUser()).email
 
-  const { first_name, last_name } = profile
+  const { first_name, last_name, profile_photo } = profile
   const initials = getInitials(first_name, last_name)
 
   return (
@@ -17,7 +17,7 @@ export async function SidebarUserInfo() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3 px-2 py-2">
             <Avatar className="size-10">
-              <AvatarImage src="" />
+              <AvatarImage src={profile_photo} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
 

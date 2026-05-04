@@ -1,9 +1,9 @@
-import { SidebarTrigger } from "../ui/sidebar"
+import { SidebarTrigger } from "../../ui/sidebar"
 import { Menu } from "lucide-react"
 import { SearchBar } from "./SearchBar"
 import { NavbarActions } from "./navbar-actions/NavbarActions"
 import { Suspense } from "react"
-import { Skeleton } from "../ui/skeleton"
+import { Skeleton } from "../../ui/skeleton"
 
 export default async function Navbar() {
   return (

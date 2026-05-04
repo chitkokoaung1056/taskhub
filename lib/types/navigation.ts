@@ -1,4 +1,4 @@
-import { iconMap } from "@/components/sidebar/icon"
+import { iconMap } from "@/components/dashboard-layout/sidebar/icon"
 
 export type MenuItemType = {
   title: string

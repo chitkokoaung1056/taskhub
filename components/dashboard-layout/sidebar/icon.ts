@@ -4,6 +4,7 @@ import {
   BarChart3,
   Users,
   FolderOpen,
+  Settings,
 } from "lucide-react";
 
 export const iconMap = {
@@ -12,4 +13,5 @@ export const iconMap = {
   BarChart3,
   Users,
   FolderOpen,
-};
+  Settings,
+} as const;

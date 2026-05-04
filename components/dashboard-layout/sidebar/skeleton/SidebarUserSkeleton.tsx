@@ -1,5 +1,5 @@
-import { SidebarMenu, SidebarMenuItem } from "../ui/sidebar"
-import { Skeleton } from "../ui/skeleton"
+import { SidebarMenu, SidebarMenuItem } from "../../../ui/sidebar"
+import { Skeleton } from "../../../ui/skeleton"
 
 const SidebarUserSkeleton = () => {
   return (

@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { Separator } from "../ui/separator"
+import { Separator } from "../../ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sidebar"
 import AppSidebarNav from "./AppSidebarNav"
 import { SidebarUserInfo } from "./SidebarUserInfo"
-import SidebarUserSkeleton from "./SidebarUserSkeleton"
+import SidebarUserSkeleton from "./skeleton/SidebarUserSkeleton"
 
 export async function AppSidebar() {
   return (

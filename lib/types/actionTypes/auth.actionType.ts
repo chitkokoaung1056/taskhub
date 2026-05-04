@@ -17,6 +17,8 @@ export type RegisterActionStateType = {
   redirectTo?: string
 }
 
+export type RegisterValuesType = Partial<RegisterType>
+
 //login
 
 export type LoginErrorsType = {
@@ -32,6 +34,8 @@ export type LoginActionStateType = {
   message?: string[]
   redirectTo?: string
 }
+
+export type LoginValuesType = Partial<LoginType>
 
 //logout
 

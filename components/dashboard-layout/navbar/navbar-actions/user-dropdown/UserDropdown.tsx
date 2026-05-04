@@ -26,7 +26,7 @@ export async function UserDropdown() {
       <DropdownMenuTrigger asChild>
         <button className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1 transition outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
           <Suspense fallback={<Skeleton className="size-8 rounded-full" />}>
-            <AvatarDropdownButton profile={profile} user={user} />
+            <AvatarDropdownButton profile={profile} />
           </Suspense>
         </button>
       </DropdownMenuTrigger>
@@ -47,7 +47,7 @@ export async function UserDropdown() {
 
         {/* Settings */}
         <DropdownMenuItem asChild>
-          <Link href="/settings" className="flex cursor-pointer items-center">
+          <Link href="/setting" className="flex cursor-pointer items-center">
             <Settings className="mr-2 size-4" />
             Settings
           </Link>
