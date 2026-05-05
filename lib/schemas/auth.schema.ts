@@ -34,3 +34,25 @@ export const loginSchema = z.object({
   email: z.email().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 })
+
+export const updatePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must include uppercase letter")
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, "Must include special character"),
+
+    confirmPassword: z.string().min(1, "Confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  })
+
+export const updateEmailSchema = z.object({
+  email: z.email("Invalid email format"),
+  password: z.string().min(1, "Password is required for verification"),
+})

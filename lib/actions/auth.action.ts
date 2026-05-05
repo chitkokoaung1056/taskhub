@@ -1,13 +1,29 @@
 "use server"
 
 import z from "zod"
-import { loginUser, logoutUser, registerUser } from "../services/auth.service"
 import {
+  deleteAccount,
+  getCurrentUser,
+  loginUser,
+  logoutUser,
+  registerUser,
+  updateEmail,
+  updatePassword,
+} from "../services/auth.service"
+import {
+  DeleteAccountActionStateType,
   LoginActionStateType,
   LogoutActionStateType,
   RegisterActionStateType,
+  UpdateEmailActionStateType,
+  UpdatePasswordActionStateType,
 } from "../types/actionTypes/auth.actionType"
-import { loginSchema, registerSchema } from "../schemas/auth.schema"
+import {
+  loginSchema,
+  registerSchema,
+  updateEmailSchema,
+  updatePasswordSchema,
+} from "../schemas/auth.schema"
 
 export async function registerUserAction(
   prevState: RegisterActionStateType,
@@ -46,7 +62,6 @@ export async function registerUserAction(
     return {
       success: true,
       message: ["User registered successfully!"],
-      redirectTo: "/dashboard",
       errors: {},
       values: {},
     }
@@ -115,6 +130,120 @@ export async function logoutUserAction(): Promise<LogoutActionStateType> {
     return {
       success: true,
       message: ["Logged out successfully!"],
+      redirectTo: "/login",
+      errors: {},
+    }
+  } catch (err) {
+    return {
+      success: false,
+      errors: {
+        general: [(err as Error).message],
+      },
+      message: [],
+    }
+  }
+}
+
+export async function updatePasswordAction(
+  prevState: UpdatePasswordActionStateType,
+  formData: FormData
+): Promise<UpdatePasswordActionStateType> {
+  const rawData = {
+    currentPassword: formData.get("currentPassword") as string,
+    newPassword: formData.get("newPassword") as string,
+    confirmPassword: formData.get("confirmPassword") as string,
+  }
+
+  const validationResult = updatePasswordSchema.safeParse(rawData)
+
+  if (!validationResult.success) {
+    const { fieldErrors } = z.flattenError(validationResult.error)
+
+    return {
+      success: false,
+      errors: fieldErrors,
+      values: rawData,
+    }
+  }
+
+  try {
+    const validatedData = validationResult.data
+
+    await updatePassword({
+      currentPassword: validatedData.currentPassword,
+      newPassword: validatedData.newPassword,
+    })
+
+    return {
+      success: true,
+      message: ["Password updated successfully"],
+      errors: {},
+      values: {},
+    }
+  } catch (err) {
+    return {
+      success: false,
+      errors: {
+        general: [(err as Error).message],
+      },
+      values: rawData,
+    }
+  }
+}
+
+export async function updateEmailAction(
+  prevState: UpdateEmailActionStateType,
+  formData: FormData
+): Promise<UpdateEmailActionStateType> {
+  const rawData = {
+    email: formData.get("email") as string,
+    password: formData.get("password") as string,
+  }
+
+  const validationResult = updateEmailSchema.safeParse(rawData)
+
+  if (!validationResult.success) {
+    const { fieldErrors } = z.flattenError(validationResult.error)
+
+    return {
+      success: false,
+      errors: fieldErrors,
+      values: rawData,
+    }
+  }
+
+  try {
+    const validatedData = validationResult.data
+
+    await updateEmail({
+      email: validatedData.email,
+      password: validatedData.password,
+    })
+
+    return {
+      success: true,
+      message: ["Email Updated Successfully"],
+      errors: {},
+      values: {},
+    }
+  } catch (err) {
+    return {
+      success: false,
+      errors: {
+        general: [(err as Error).message],
+      },
+      values: rawData,
+    }
+  }
+}
+
+export async function deleteAccountAction(): Promise<DeleteAccountActionStateType> {
+  try {
+    await deleteAccount()
+
+    return {
+      success: true,
+      message: ["Account Deleted successfully!"],
       redirectTo: "/login",
       errors: {},
     }

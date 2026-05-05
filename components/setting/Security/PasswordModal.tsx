@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,59 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ChevronRight, KeyRound } from "lucide-react"
+import {
+  UpdatePasswordActionStateType,
+  UpdatePasswordErrorsType,
+  UpdatePasswordValuesType,
+} from "@/lib/types/actionTypes/auth.actionType"
+import { updatePasswordAction } from "@/lib/actions/auth.action"
+import { toast } from "sonner"
+
+const initialState: UpdatePasswordActionStateType = {
+  success: false,
+  errors: {},
+  message: [],
+  values: {},
+}
 
 export function ChangePasswordModal() {
   const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const [errors, setErrors] = useState<UpdatePasswordErrorsType>({})
+  const [formValues, setFormValues] = useState<UpdatePasswordValuesType>({})
+
+  const clearError = (field: keyof UpdatePasswordErrorsType) => {
+    setErrors((prev) => ({ ...prev, [field]: undefined }))
+  }
+
+  const clearAll = () => {
+    setErrors({})
+    setFormValues({})
+  }
+
+  const handleClose = () => {
+    clearAll()
+    setOpen(false)
+  }
+
+  const handleUpdatePassword = async (formData: FormData) => {
+    clearAll()
+    startTransition(async () => {
+      const result = await updatePasswordAction(initialState, formData)
+
+      if (result.success && result.message) {
+        toast.success(result.message[0])
+        handleClose()
+      } else if (!result.success && result.errors?.general) {
+        toast.error(result.errors.general[0])
+      }
+
+      if (!result.success && result.errors) {
+        setErrors(result.errors || {})
+        setFormValues(result.values || {})
+      }
+    })
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -33,18 +83,62 @@ export function ChangePasswordModal() {
         </button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent
+        onInteractOutside={(e) => e.preventDefault()}
+        onCloseAutoFocus={handleClose}
+      >
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
         </DialogHeader>
 
-        <div className="mt-4 space-y-4">
-          <Input type="password" placeholder="Current password" />
-          <Input type="password" placeholder="New password" />
-          <Input type="password" placeholder="Confirm new password" />
+        <form action={handleUpdatePassword} className="mt-4 space-y-5">
+          <div className="space-y-1">
+            <Input
+              name="currentPassword"
+              type="password"
+              placeholder="Current password"
+              defaultValue={formValues.currentPassword}
+              onChange={() => clearError("currentPassword")}
+            />
+            {errors.currentPassword && (
+              <p className="text-xs text-destructive">
+                {errors.currentPassword[0]}
+              </p>
+            )}
+          </div>
+          <div className="space-y-1">
+            <Input
+              type="password"
+              name="newPassword"
+              placeholder="New password"
+              defaultValue={formValues.newPassword}
+              onChange={() => clearError("newPassword")}
+            />
+            {errors.newPassword && (
+              <p className="text-xs text-destructive">
+                {errors.newPassword[0]}
+              </p>
+            )}
+          </div>
+          <div className="space-y-1">
+            <Input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm new password"
+              defaultValue={formValues.confirmPassword}
+              onChange={() => clearError("confirmPassword")}
+            />
+            {errors.confirmPassword && (
+              <p className="text-xs text-destructive">
+                {errors.confirmPassword[0]}
+              </p>
+            )}
+          </div>
 
-          <Button className="w-full">Update Password</Button>
-        </div>
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? "Updating Password..." : " Update Password"}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   )
