@@ -92,7 +92,11 @@ export default function TaskForm({
   }
 
   return (
-    <DialogContent className="p-6 sm:max-w-xl" showCloseButton={false}>
+    <DialogContent
+      className="p-6 sm:max-w-xl"
+      onCloseAutoFocus={onClose}
+      onInteractOutside={(e) => e.preventDefault()}
+    >
       <DialogHeader>
         <DialogTitle>
           {formType === "add" ? "Create New Task" : "Edit Task"}

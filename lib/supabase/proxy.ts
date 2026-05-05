@@ -47,17 +47,17 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   const isAuthPage = pathname === "/login" || pathname === "/register"
+  const isLandingPage = pathname === "/"
 
-  if (!user && !isAuthPage) {
+  if (!user && !isAuthPage && !isLandingPage) {
     const url = request.nextUrl.clone()
-    url.pathname = "/login"
+    url.pathname = "/"
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthPage) {
+  if (user && isAuthPage && isLandingPage) {
     const url = request.nextUrl.clone()
 
-    // ⚠️ change this depending on your structure
     url.pathname = "/dashboard"
 
     return NextResponse.redirect(url)

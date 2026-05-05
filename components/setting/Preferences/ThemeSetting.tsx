@@ -20,6 +20,7 @@ const themes = [
 export function ThemeSetting() {
   const { theme, setTheme } = useTheme()
   const [isClient, setIsClient] = useState(false)
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true)
@@ -27,27 +28,26 @@ export function ThemeSetting() {
 
   if (!isClient) {
     return (
-      <div className="flex w-full items-center justify-between rounded-lg border px-4 py-3">
-        <div className="space-y-1">
+      <div className="flex flex-col gap-3 rounded-lg border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
           <p className="text-sm font-medium">Theme</p>
           <p className="text-xs text-muted-foreground">
             Choose your preferred theme
           </p>
         </div>
 
-        <div className="h-8 w-24 animate-pulse rounded bg-muted" />
+        <div className="h-10 w-full animate-pulse rounded bg-muted sm:w-32" />
       </div>
     )
   }
 
   const current = themes.find((t) => t.value === theme) ?? themes[2]
-
   const CurrentIcon = current.icon
 
   return (
-    <div className="flex w-full items-center justify-between rounded-lg border px-4 py-3">
+    <div className="flex flex-col gap-3 rounded-lg border px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       {/* Left */}
-      <div className="space-y-1">
+      <div>
         <p className="text-sm font-medium">Theme</p>
         <p className="text-xs text-muted-foreground">
           Choose your preferred theme
@@ -57,13 +57,13 @@ export function ThemeSetting() {
       {/* Right */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex max-w-40 min-w-40 items-center justify-between rounded-md border px-3 py-2 text-sm transition hover:bg-accent">
+          <button className="flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition hover:bg-accent sm:w-auto sm:min-w-40">
             <div className="flex items-center gap-2">
               <CurrentIcon className="h-4 w-4 text-muted-foreground" />
               <span>{current.label}</span>
             </div>
 
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            <ChevronDown className="size-4 text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
 

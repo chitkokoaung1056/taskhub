@@ -1,4 +1,3 @@
-import imageCompression from 'browser-image-compression';
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
@@ -39,3 +38,5 @@ export function formatDate(date: string | Date) {
     day: "numeric",
   })
 }
+
+

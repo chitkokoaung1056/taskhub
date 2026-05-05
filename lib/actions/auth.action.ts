@@ -3,7 +3,6 @@
 import z from "zod"
 import {
   deleteAccount,
-  getCurrentUser,
   loginUser,
   logoutUser,
   registerUser,
@@ -64,6 +63,7 @@ export async function registerUserAction(
       message: ["User registered successfully!"],
       errors: {},
       values: {},
+      redirectTo: "/dashboard",
     }
   } catch (err) {
     return {
@@ -130,7 +130,7 @@ export async function logoutUserAction(): Promise<LogoutActionStateType> {
     return {
       success: true,
       message: ["Logged out successfully!"],
-      redirectTo: "/login",
+      redirectTo: "/",
       errors: {},
     }
   } catch (err) {
@@ -244,7 +244,7 @@ export async function deleteAccountAction(): Promise<DeleteAccountActionStateTyp
     return {
       success: true,
       message: ["Account Deleted successfully!"],
-      redirectTo: "/login",
+      redirectTo: "/",
       errors: {},
     }
   } catch (err) {

@@ -13,8 +13,8 @@ import { useState } from "react"
 type Language = "en" | "mm"
 
 const languages = [
-  { value: "en", label: "English", icon: Globe },
-  { value: "mm", label: "Myanmar", icon: Globe },
+  { value: "en", label: "English" },
+  { value: "mm", label: "Myanmar" },
 ]
 
 export function LanguageSetting() {
@@ -23,10 +23,10 @@ export function LanguageSetting() {
   const current = languages.find((l) => l.value === language)
 
   return (
-    <div className="flex w-full items-center justify-between rounded-lg border px-4 py-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border px-4 py-3">
+      
       {/* Left */}
-
-      <div className="space-y-1">
+      <div>
         <p className="text-sm font-medium">Language</p>
         <p className="text-xs text-muted-foreground">
           Choose your preferred language
@@ -36,7 +36,14 @@ export function LanguageSetting() {
       {/* Right */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex max-w-40 min-w-40 items-center justify-between gap-6 rounded-md border px-3 py-2 text-sm transition hover:bg-accent">
+          <button
+            className="
+              flex w-full items-center justify-between
+              rounded-md border px-3 py-2 text-sm
+              transition hover:bg-accent
+              sm:w-auto sm:min-w-40
+            "
+          >
             <div className="flex items-center gap-2">
               <Globe className="h-4 w-4 text-muted-foreground" />
               <span>{current?.label}</span>
