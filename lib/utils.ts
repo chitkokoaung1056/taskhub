@@ -1,4 +1,3 @@
-
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -39,4 +38,6 @@ export function formatDate(date: string | Date) {
   })
 }
 
-
+export function getBaseUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://192.168.1.22:3000"
+}

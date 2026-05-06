@@ -2,6 +2,7 @@
 
 import { ThemeToggleButton } from "@/components/dashboard-layout/navbar/navbar-actions/ThemeToggleButton"
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { Suspense, useState } from "react"
 
 export function CurrentTime() {
@@ -38,19 +39,19 @@ export default function LandingPage() {
 
           <div className="hidden gap-3 md:flex">
             <ThemeToggleButton className="mt-1.5" />
-            <a
+            <Link
               href="/login"
               className="rounded-lg border border-border px-4 py-2 transition hover:bg-accent"
             >
               Login
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/register"
               className="rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
             >
               Get Started
-            </a>
+            </Link>
           </div>
 
           <div className="space-x-4 md:hidden">
@@ -70,8 +71,8 @@ export default function LandingPage() {
             <a href="#about">About</a>
             <a href="#contact">Contact</a>
             <hr className="border-border" />
-            <a href="/login">Login</a>
-            <a href="/register">Get Started</a>
+            <Link href="/login">Login</Link>
+            <Link href="/register">Get Started</Link>
           </div>
         )}
       </header>
@@ -213,12 +214,12 @@ export default function LandingPage() {
             Built for real-world productivity and admin control.
           </p>
 
-          <a
+          <Link
             href="/register"
             className="inline-flex rounded-xl bg-primary px-8 py-3 text-primary-foreground shadow-md transition hover:scale-105"
           >
             Get Started Free
-          </a>
+          </Link>
         </div>
       </section>
 

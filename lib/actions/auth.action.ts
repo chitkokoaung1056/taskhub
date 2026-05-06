@@ -60,10 +60,9 @@ export async function registerUserAction(
 
     return {
       success: true,
-      message: ["User registered successfully!"],
+      message: ["Email Comfirmation was sent to your email!"],
       errors: {},
       values: {},
-      redirectTo: "/dashboard",
     }
   } catch (err) {
     return {

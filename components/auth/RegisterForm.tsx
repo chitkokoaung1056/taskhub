@@ -23,7 +23,6 @@ import {
 } from "@/lib/types/actionTypes/auth.actionType"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 
@@ -39,7 +38,6 @@ export default function RegisterForm({
   const [isPending, startTransition] = useTransition()
   const [errors, setErrors] = useState<RegisterErrorsType>({})
   const [formValues, setFormValues] = useState<RegisterValuesType>({})
-  const router = useRouter()
 
   const clearError = (field: keyof RegisterErrorsType) => {
     setErrors((prev) => ({ ...prev, [field]: undefined }))
@@ -60,7 +58,6 @@ export default function RegisterForm({
 
       if (result.success && result.message) {
         toast.success(result.message[0])
-        router.push(result.redirectTo!)
       } else if (!result.success && result.errors?.general) {
         toast.error(result.errors.general[0])
       }

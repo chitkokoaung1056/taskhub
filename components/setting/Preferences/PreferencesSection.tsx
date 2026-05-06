@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { ThemeSetting } from "./ThemeSetting"
-import { LanguageSetting } from "./LanguageSetting"
 
 export function PreferencesSection() {
   return (
@@ -20,7 +19,6 @@ export function PreferencesSection() {
 
       <CardContent className="space-y-3">
         <ThemeSetting />
-        <LanguageSetting />
       </CardContent>
     </Card>
   )

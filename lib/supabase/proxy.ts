@@ -45,21 +45,12 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims
 
   const pathname = request.nextUrl.pathname
+  const isProtectedRoute =
+    pathname.startsWith("/dashboard") || pathname.startsWith("/tasks")
 
-  const isAuthPage = pathname === "/login" || pathname === "/register"
-  const isLandingPage = pathname === "/"
-
-  if (!user && !isAuthPage && !isLandingPage) {
+  if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/"
-    return NextResponse.redirect(url)
-  }
-
-  if (user && isAuthPage && isLandingPage) {
-    const url = request.nextUrl.clone()
-
-    url.pathname = "/dashboard"
-
     return NextResponse.redirect(url)
   }
 

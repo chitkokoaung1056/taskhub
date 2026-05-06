@@ -1,21 +1,49 @@
 import { createClient } from "../supabase/server"
+import { getBaseUrl } from "../utils"
 
+/* ---------------------------
+   ERROR MAPPER (IMPORTANT)
+---------------------------- */
+function mapAuthError(message: string) {
+  const msg = message.toLowerCase()
+
+  if (msg.includes("invalid login credentials")) {
+    return "Email or password is incorrect"
+  }
+
+  if (msg.includes("password")) {
+    return "Password is incorrect"
+  }
+
+  if (msg.includes("email not confirmed")) {
+    return "Please confirm your email first"
+  }
+
+  if (msg.includes("rate limit")) {
+    return "Too many attempts. Please try again later"
+  }
+
+  return "Something went wrong. Please try again"
+}
+
+/* ---------------------------
+   GET USER
+---------------------------- */
 export async function getCurrentUser() {
   const supabase = await createClient()
 
   const { data, error } = await supabase.auth.getUser()
 
-  if (error) {
-    throw new Error(error.message)
-  }
-
-  if (!data.user) {
-    throw new Error("User not found")
+  if (error || !data.user) {
+    throw new Error("You are not logged in")
   }
 
   return data.user
 }
 
+/* ---------------------------
+   REGISTER
+---------------------------- */
 export async function registerUser(data: {
   email: string
   password: string
@@ -32,35 +60,50 @@ export async function registerUser(data: {
         first_name: data.first_name,
         last_name: data.last_name,
       },
-      emailRedirectTo: "/dashboard",
+      emailRedirectTo: `${getBaseUrl()}/callback`,
     },
   })
 
   if (error) {
-    throw new Error(error.message)
+    throw new Error(mapAuthError(error.message))
   }
+
+  return { success: true }
 }
 
+/* ---------------------------
+   LOGIN
+---------------------------- */
 export async function loginUser(data: { email: string; password: string }) {
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    throw new Error(error.message)
+    throw new Error(mapAuthError(error.message))
   }
+
+  return { success: true }
 }
 
+/* ---------------------------
+   LOGOUT
+---------------------------- */
 export async function logoutUser() {
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signOut()
 
   if (error) {
-    throw new Error(error.message)
+    throw new Error("Logout failed. Please try again.")
   }
+
+  return { success: true }
 }
 
+/* ---------------------------
+   UPDATE PASSWORD
+---------------------------- */
 export async function updatePassword(data: {
   currentPassword: string
   newPassword: string
@@ -73,21 +116,29 @@ export async function updatePassword(data: {
   })
 
   if (error) {
-    throw new Error(error.message)
+    const msg = error.message.toLowerCase()
+
+    if (msg.includes("invalid") || msg.includes("credentials")) {
+      throw new Error("Current password is incorrect")
+    }
+
+    throw new Error("Failed to update password")
   }
+
+  return { success: true }
 }
 
+/* ---------------------------
+   UPDATE EMAIL
+---------------------------- */
 export async function updateEmail(data: { email: string; password: string }) {
   const supabase = await createClient()
 
-  const currentUser = await getCurrentUser()
+  const user = await getCurrentUser()
 
-  if (!currentUser) {
-    throw new Error("User not found")
-  }
-
+  // re-auth
   const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: currentUser.email || "",
+    email: user.email!,
     password: data.password,
   })
 
@@ -95,22 +146,33 @@ export async function updateEmail(data: { email: string; password: string }) {
     throw new Error("Incorrect password")
   }
 
-  const { error: updateError } = await supabase.auth.updateUser({
-    email: data.email,
-  })
+  const { error: updateError } = await supabase.auth.updateUser(
+    { email: data.email },
+    {
+      emailRedirectTo: `${getBaseUrl()}/callback`,
+    }
+  )
 
   if (updateError) {
-    throw new Error(updateError.message)
+    throw new Error(mapAuthError(updateError.message))
   }
+
+  return { success: true }
 }
 
+/* ---------------------------
+   DELETE ACCOUNT
+---------------------------- */
 export async function deleteAccount() {
-  const supabase = await createClient("deleteAccount")
+  const supabase = await createClient()
 
-  const userId = (await getCurrentUser()).id
-  const { error } = await supabase.auth.admin.deleteUser(userId)
+  const user = await getCurrentUser()
+
+  const { error } = await supabase.auth.admin.deleteUser(user.id)
 
   if (error) {
-    throw new Error(error.message)
+    throw new Error("Failed to delete account. Please contact support.")
   }
+
+  return { success: true }
 }
