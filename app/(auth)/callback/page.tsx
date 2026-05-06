@@ -10,27 +10,27 @@ export default function CallbackPage() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      // 🔥 REQUIRED: completes BOTH signup + email update verification
-      const { data, error } = await supabase.auth.exchangeCodeForSession(
+      const { error } = await supabase.auth.exchangeCodeForSession(
         window.location.href
       )
 
-      if (error || !data.session) {
+      if (error) {
+        router.replace("/login")
+        return
+      }
+
+      // 🔥 IMPORTANT: re-check session AFTER exchange
+      const { data } = await supabase.auth.getSession()
+
+      if (!data.session) {
         router.replace("/login")
         return
       }
 
       const flow = sessionStorage.getItem("auth_flow")
-
-      // cleanup
       sessionStorage.removeItem("auth_flow")
 
-      // 🎯 route based on flow type
-      if (flow === "email_update") {
-        router.replace("/profile") // or /settings
-      } else {
-        router.replace("/dashboard")
-      }
+      router.replace(flow === "email_update" ? "/setting" : "/dashboard")
     }
 
     handleAuth()

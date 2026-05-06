@@ -85,11 +85,16 @@ export async function createTask(task: TaskType) {
 export async function getTasks(
   search?: string,
   filter?: FilterOptionType,
-  sort?: SortOptionType
+  sort?: SortOptionType,
+  userId?: string 
 ): Promise<TaskType[]> {
   const supabase = await createClient()
 
   let query = supabase.from("tasks").select("*")
+
+  if (userId) {
+    query = query.eq("user_id", userId)
+  }
 
   if (search) {
     query = query.or(

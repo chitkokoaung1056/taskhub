@@ -39,22 +39,20 @@ function ThemeHotkey() {
 
   React.useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.repeat) {
-        return
-      }
+      // ignore repeated / default prevented events
+      if (event.defaultPrevented || event.repeat) return
 
-      if (event.metaKey || event.ctrlKey || event.altKey) {
-        return
-      }
+      // ignore if user is typing
+      if (isTypingTarget(event.target)) return
 
-      if (event.key.toLowerCase() !== "d") {
-        return
-      }
+      // ignore modifier key combos
+      if (event.metaKey || event.ctrlKey || event.altKey) return
 
-      if (isTypingTarget(event.target)) {
-        return
-      }
+      // 🔒 SAFE FIX: prevent crash if key is undefined
+      const key = event.key?.toLowerCase()
+      if (!key || key !== "d") return
 
+      // toggle theme
       setTheme(resolvedTheme === "dark" ? "light" : "dark")
     }
 

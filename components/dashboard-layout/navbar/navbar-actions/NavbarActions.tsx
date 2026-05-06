@@ -7,7 +7,9 @@ export function NavbarActions() {
     <div className="flex items-center gap-2">
       <ThemeToggleButton />
 
-      <NotificationsButton />
+      {/*
+      will implement after v3 of admin panel
+      <NotificationsButton /> */}
 
       <UserDropdown />
     </div>

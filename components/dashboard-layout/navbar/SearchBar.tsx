@@ -18,7 +18,6 @@ export function SearchBar() {
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { replace } = useRouter()
-
   const [open, setOpen] = useState(false)
 
   const updateSearch = useDebouncedCallback((term: string) => {
@@ -30,18 +29,22 @@ export function SearchBar() {
     replace(`${pathname}?${params.toString()}`)
   }, 500)
 
+  if (!pathname.startsWith("/task")) {
+    return null
+  }
+
   const defaultValue = searchParams.get("search") || ""
 
   return (
     <>
       {/* ================= DESKTOP ================= */}
       <div className="relative hidden w-full max-w-md sm:block">
-        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           defaultValue={defaultValue}
           onChange={(e) => updateSearch(e.target.value)}
           placeholder="Search..."
-          className="pl-9 pr-3 rounded-full border-muted bg-muted/40 focus:bg-background transition"
+          className="rounded-full border-muted bg-muted/40 pr-3 pl-9 transition focus:bg-background"
         />
       </div>
 
@@ -57,18 +60,18 @@ export function SearchBar() {
 
       {/* ================= MOBILE DIALOG ================= */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md fixed top-6 left-1/2 -translate-x-1/2 translate-y-0 rounded-xl border bg-background shadow-xl">
+        <DialogContent className="fixed top-6 left-1/2 -translate-x-1/2 translate-y-0 rounded-xl border bg-background shadow-xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center">Search</DialogTitle>
           </DialogHeader>
 
           <div className="relative mt-2">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               defaultValue={defaultValue}
               onChange={(e) => updateSearch(e.target.value)}
               placeholder="Search..."
-              className="pl-9 pr-3 h-11 rounded-lg"
+              className="h-11 rounded-lg pr-3 pl-9"
               autoFocus
             />
           </div>

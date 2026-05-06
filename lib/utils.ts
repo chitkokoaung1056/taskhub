@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { ExportUserDataType } from "./types/actionTypes/export.actionType"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -40,4 +41,19 @@ export function formatDate(date: string | Date) {
 
 export function getBaseUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL || "http://192.168.1.22:3000"
+}
+
+export function downloadJSON(data: ExportUserDataType) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  })
+
+  const url = URL.createObjectURL(blob)
+
+  const a = document.createElement("a")
+  a.href = url
+  a.download = "taskhub-export.json"
+  a.click()
+
+  URL.revokeObjectURL(url)
 }

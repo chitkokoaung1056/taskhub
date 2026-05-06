@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,31 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Download, ChevronRight } from "lucide-react"
+import { toast } from "sonner"
+import { exportUserDataAction } from "@/lib/actions/export.action"
+import { downloadJSON } from "@/lib/utils"
 
 export function ExportDataModal() {
   const [open, setOpen] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const handleExport = () => {
+    startTransition(async () => {
+      const result = await exportUserDataAction()
+
+      if (result.success && result.message) {
+        toast.success(result.message[0])
+
+        if (result.data) {
+          downloadJSON(result.data)
+        }
+
+        setOpen(false)
+      } else {
+        toast.error(result.errors?.general?.[0])
+      }
+    })
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -41,11 +63,16 @@ export function ExportDataModal() {
 
         <div className="mt-4 space-y-4">
           <p className="text-sm text-muted-foreground">
-            You will receive a downloadable file containing all your account
-            data.
+            This will generate a file containing all your account data.
           </p>
 
-          <Button className="w-full">Download Data</Button>
+          <Button
+            className="w-full"
+            disabled={isPending}
+            onClick={handleExport}
+          >
+            {isPending ? "Exporting..." : "Download Data"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

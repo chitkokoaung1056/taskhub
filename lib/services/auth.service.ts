@@ -67,8 +67,6 @@ export async function registerUser(data: {
   if (error) {
     throw new Error(mapAuthError(error.message))
   }
-
-  return { success: true }
 }
 
 /* ---------------------------
@@ -97,8 +95,6 @@ export async function logoutUser() {
   if (error) {
     throw new Error("Logout failed. Please try again.")
   }
-
-  return { success: true }
 }
 
 /* ---------------------------
@@ -110,6 +106,10 @@ export async function updatePassword(data: {
 }) {
   const supabase = await createClient()
 
+  if (!data.currentPassword || !data.newPassword) {
+    throw new Error("All fields are required")
+  }
+
   const { error } = await supabase.auth.updateUser({
     password: data.newPassword,
     current_password: data.currentPassword,
@@ -118,14 +118,21 @@ export async function updatePassword(data: {
   if (error) {
     const msg = error.message.toLowerCase()
 
-    if (msg.includes("invalid") || msg.includes("credentials")) {
+    // 🔥 better detection
+    if (
+      msg.includes("invalid") ||
+      msg.includes("credentials") ||
+      msg.includes("authentication")
+    ) {
       throw new Error("Current password is incorrect")
     }
 
-    throw new Error("Failed to update password")
-  }
+    if (msg.includes("session")) {
+      throw new Error("Session expired. Please login again")
+    }
 
-  return { success: true }
+    throw new Error("Unable to update password. Try again later")
+  }
 }
 
 /* ---------------------------
@@ -156,16 +163,13 @@ export async function updateEmail(data: { email: string; password: string }) {
   if (updateError) {
     throw new Error(mapAuthError(updateError.message))
   }
-
-  return { success: true }
 }
 
 /* ---------------------------
    DELETE ACCOUNT
 ---------------------------- */
 export async function deleteAccount() {
-  const supabase = await createClient()
-
+  const supabase = await createClient("deleteAccount")
   const user = await getCurrentUser()
 
   const { error } = await supabase.auth.admin.deleteUser(user.id)
@@ -173,6 +177,4 @@ export async function deleteAccount() {
   if (error) {
     throw new Error("Failed to delete account. Please contact support.")
   }
-
-  return { success: true }
 }
