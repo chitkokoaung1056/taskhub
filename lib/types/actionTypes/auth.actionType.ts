@@ -89,3 +89,35 @@ export type DeleteAccountActionStateType = BaseActionState<
   void,
   DeleteAccountErrorsType
 >
+
+//forgot password
+export type ForgotPasswordErrorsType = {
+  email?: string[]
+  general?: string[]
+}
+
+export type ForgotPasswordValuesType = {
+  email?: string
+}
+
+export type ForgotPasswordActionStateType = BaseActionState<
+  ForgotPasswordValuesType,
+  ForgotPasswordErrorsType
+>
+
+//reset-password
+export type ResetPasswordErrorsType = {
+  password?: string[]
+  confirmPassword?: string[]
+  general?: string[]
+}
+
+export type ResetPasswordValuesType = {
+  password?: string
+  confirmPassword?: string
+}
+
+export type ResetPasswordActionStateType = BaseActionState<
+  ResetPasswordValuesType,
+  ResetPasswordErrorsType
+>

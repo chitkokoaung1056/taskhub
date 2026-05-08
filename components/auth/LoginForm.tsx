@@ -110,12 +110,12 @@ export default function LoginForm({
             <Field>
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                {/*<Link
+                <Link
                   href="/forgot-password"
                   className="text-xs text-muted-foreground hover:text-primary hover:underline"
                 >
                   Forgot password?
-                </Link> */}
+                </Link> 
               </div>
 
               <Input

@@ -50,22 +50,20 @@ export default function RegisterForm({
 
   const handleRegister = async (formData: FormData) => {
     setErrors({})
-    setFormValues({})
 
     startTransition(async () => {
-      clearAll()
       const result = await registerUserAction(initialState, formData)
 
       if (result.success && result.message) {
         toast.success(result.message[0])
-      } else if (!result.success && result.errors?.general) {
+      }
+
+      if (!result.success && result.errors?.general) {
         toast.error(result.errors.general[0])
       }
 
-      if (!result.success && result.errors) {
-        setErrors(result.errors || {})
-        setFormValues(result.values || {})
-      }
+      setErrors(result.errors || {})
+      setFormValues(result.values || {})
     })
   }
 

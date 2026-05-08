@@ -56,3 +56,25 @@ export const updateEmailSchema = z.object({
   email: z.email("Invalid email format"),
   password: z.string().min(1, "Password is required for verification"),
 })
+
+export const forgotPasswordSchema = z.object({
+  email: z.email("Invalid email format"),
+})
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters long")
+      .regex(/[A-Z]/, "Password must include at least one uppercase letter")
+      .regex(
+        /[!@#$%^&*(),.?\":{}|<>]/,
+        "Password must include at least one special character"
+      ),
+
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  })

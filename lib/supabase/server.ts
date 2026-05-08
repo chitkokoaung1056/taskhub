@@ -1,12 +1,13 @@
 import { createServerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
-export async function createClient(deleteAccount: "" | "deleteAccount" = "") {
+export async function createClient(options?: { isAdmin: boolean }) {
   const cookieStore = await cookies()
+  const isAdmin = options?.isAdmin || false
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    !deleteAccount
+    !isAdmin
       ? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
       : process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!,
     {
