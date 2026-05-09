@@ -1,43 +1,37 @@
 import { createClient } from "../supabase/server"
 import { getBaseUrl } from "../utils"
 
-/* ---------------------------
-   ERROR MAPPER
----------------------------- */
+/* -----------------------------
+   AUTH ERROR MAPPER
+------------------------------ */
 function mapAuthError(message: string) {
   const msg = message.toLowerCase()
 
-  // login / credentials
+  // login errors
   if (msg.includes("invalid login credentials")) {
     return "Email or password is incorrect"
   }
 
-  // wrong current password
-  if (
-    msg.includes("current password") ||
-    msg.includes("incorrect password") ||
-    msg.includes("authentication") ||
-    msg.includes("invalid credentials")
-  ) {
+  // password issues
+  if (msg.includes("current password") || msg.includes("incorrect password")) {
     return "Current password is incorrect"
   }
 
-  // email confirmation
+  if (msg.includes("password")) {
+    return "Password does not meet requirements"
+  }
+
+  // email issues
   if (msg.includes("email not confirmed")) {
     return "Please verify your email before signing in"
   }
 
-  // existing user
-  if (
-    msg.includes("already registered") ||
-    msg.includes("user already registered")
-  ) {
+  if (msg.includes("already registered")) {
     return "An account with this email already exists"
   }
 
-  // weak password
-  if (msg.includes("password should")) {
-    return "Password does not meet security requirements"
+  if (msg.includes("email")) {
+    return "Unable to process email request. Please try again"
   }
 
   // rate limit
@@ -45,17 +39,17 @@ function mapAuthError(message: string) {
     return "Too many attempts. Please try again later"
   }
 
-  // session expired
+  // session
   if (msg.includes("session")) {
-    return "Your session expired. Please login again"
+    return "Session expired. Please login again"
   }
 
   return "Something went wrong. Please try again"
 }
 
-/* ---------------------------
-   GET USER
----------------------------- */
+/* -----------------------------
+   GET CURRENT USER
+------------------------------ */
 export async function getCurrentUser() {
   const supabase = await createClient()
 
@@ -68,9 +62,9 @@ export async function getCurrentUser() {
   return data.user
 }
 
-/* ---------------------------
+/* -----------------------------
    REGISTER
----------------------------- */
+------------------------------ */
 export async function registerUser(data: {
   email: string
   password: string
@@ -87,7 +81,6 @@ export async function registerUser(data: {
         first_name: data.first_name,
         last_name: data.last_name,
       },
-      emailRedirectTo: `${getBaseUrl()}/auth/confirm?next=/dashboard`,
     },
   })
 
@@ -96,9 +89,9 @@ export async function registerUser(data: {
   }
 }
 
-/* ---------------------------
+/* -----------------------------
    LOGIN
----------------------------- */
+------------------------------ */
 export async function loginUser(data: { email: string; password: string }) {
   const supabase = await createClient()
 
@@ -109,22 +102,22 @@ export async function loginUser(data: { email: string; password: string }) {
   }
 }
 
-/* ---------------------------
+/* -----------------------------
    LOGOUT
----------------------------- */
+------------------------------ */
 export async function logoutUser() {
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signOut()
 
   if (error) {
-    throw new Error("Logout failed. Please try again")
+    throw new Error("Unable to logout. Please try again")
   }
 }
 
-/* ---------------------------
+/* -----------------------------
    UPDATE PASSWORD
----------------------------- */
+------------------------------ */
 export async function updatePassword(data: {
   currentPassword: string
   newPassword: string
@@ -132,7 +125,7 @@ export async function updatePassword(data: {
   const supabase = await createClient()
 
   if (!data.currentPassword || !data.newPassword) {
-    throw new Error("All fields are required")
+    throw new Error("Please fill in all fields")
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -145,15 +138,20 @@ export async function updatePassword(data: {
   }
 }
 
-/* ---------------------------
+/* -----------------------------
    UPDATE EMAIL
----------------------------- */
+------------------------------ */
 export async function updateEmail(data: { email: string; password: string }) {
   const supabase = await createClient()
 
   const user = await getCurrentUser()
 
-  // re-authenticate
+  // same email check
+  if (user.email === data.email) {
+    throw new Error("Please enter a different email")
+  }
+
+  // verify password
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: user.email!,
     password: data.password,
@@ -163,18 +161,24 @@ export async function updateEmail(data: { email: string; password: string }) {
     throw new Error("Current password is incorrect")
   }
 
-  const { error: updateError } = await supabase.auth.updateUser({
-    email: data.email,
-  })
+  // update email
+  const { error: updateError } = await supabase.auth.updateUser(
+    {
+      email: data.email,
+    },
+    {
+      emailRedirectTo: `${getBaseUrl()}/auth/confirm`,
+    }
+  )
 
   if (updateError) {
-    throw new Error(mapAuthError(updateError.message))
+    throw new Error("Unable to send email confirmation. Please try again")
   }
 }
 
-/* ---------------------------
+/* -----------------------------
    DELETE ACCOUNT
----------------------------- */
+------------------------------ */
 export async function deleteAccount() {
   const supabase = await createClient({ isAdmin: true })
 
@@ -183,28 +187,54 @@ export async function deleteAccount() {
   const { error } = await supabase.auth.admin.deleteUser(user.id)
 
   if (error) {
-    throw new Error("Failed to delete account. Please contact support.")
+    throw new Error("Failed to delete account. Please contact support")
   }
 }
 
+/* -----------------------------
+   FORGOT PASSWORD
+------------------------------ */
 export async function forgotPassword(email: string) {
   const supabase = await createClient()
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${getBaseUrl()}/auth/confirm?next=/update-password`,
+    redirectTo: `${getBaseUrl()}/reset-password`,
   })
+
   if (error) {
     throw new Error(mapAuthError(error.message))
   }
 }
 
+/* -----------------------------
+   RESET PASSWORD
+------------------------------ */
 export async function resetPassword(newPassword: string) {
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.updateUser({
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user?.email) {
+    throw new Error("User not found")
+  }
+
+  // prevent same password
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
     password: newPassword,
   })
 
-  if (error) {
-    throw new Error("Failed to reset password")
+  if (!signInError) {
+    throw new Error("New password must be different from current password")
+  }
+
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  })
+
+  if (updateError) {
+    throw new Error(mapAuthError(updateError.message))
   }
 }

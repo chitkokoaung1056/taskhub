@@ -13,11 +13,6 @@ export const config = {
 
     "/login",
     "/register",
-
-    "/reset-password",
-    "/forgot-password",
-
-    "/auth/confirm",
     "/",
   ],
 }

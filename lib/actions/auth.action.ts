@@ -7,6 +7,7 @@ import {
   loginUser,
   logoutUser,
   registerUser,
+  resetPassword,
   updateEmail,
   updatePassword,
 } from "../services/auth.service"
@@ -216,11 +217,11 @@ export async function resetPasswordAction(
   try {
     const validatedData = validationResult.data
 
-    await forgotPassword(validatedData.confirmPassword)
+    await resetPassword(validatedData.confirmPassword)
 
     return {
       success: true,
-      message: ["Password reset link sent to your email"],
+      message: ["Password updated successfully"],
       errors: {},
       redirectTo: "/login",
       values: {},
@@ -312,11 +313,9 @@ export async function updateEmailAction(
       password: validatedData.password,
     })
 
-    revalidatePath("/setting")
-
     return {
       success: true,
-      message: ["Email Updated Successfully"],
+      message: ["Email Update Comfirmation was sent to your email!"],
       errors: {},
       values: {},
     }
