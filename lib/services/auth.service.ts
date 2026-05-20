@@ -220,7 +220,6 @@ export async function resetPassword(newPassword: string) {
     throw new Error("User not found")
   }
 
-  // prevent same password
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: user.email,
     password: newPassword,

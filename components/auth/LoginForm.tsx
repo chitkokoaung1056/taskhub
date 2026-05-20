@@ -111,7 +111,7 @@ export default function LoginForm({
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Link
-                  href="/forgot-password"
+                  href="/auth/forgot-password"
                   className="text-xs text-muted-foreground hover:text-primary hover:underline"
                 >
                   Forgot password?
@@ -152,7 +152,7 @@ export default function LoginForm({
               onClick={clearAll}
               replace
               aria-disabled={isPending}
-              href="/register"
+              href="/auth/register"
               className="font-medium text-primary hover:underline"
             >
               Create one

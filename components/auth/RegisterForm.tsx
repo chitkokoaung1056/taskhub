@@ -201,7 +201,7 @@ export default function RegisterForm({
               onClick={clearAll}
               replace
               aria-disabled={isPending}
-              href="/login"
+              href="/auth/login"
               className="font-medium text-primary hover:underline"
             >
               Sign in

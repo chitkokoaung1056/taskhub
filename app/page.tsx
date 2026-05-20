@@ -39,15 +39,16 @@ export default function LandingPage() {
 
           <div className="hidden gap-3 md:flex">
             <ThemeToggleButton className="mt-1.5" />
+
             <Link
-              href="/login"
+              href="/auth/login"
               className="rounded-lg border border-border px-4 py-2 transition hover:bg-accent"
             >
               Login
             </Link>
 
             <Link
-              href="/register"
+              href="/auth/register"
               className="rounded-lg bg-primary px-4 py-2 text-primary-foreground transition hover:opacity-90"
             >
               Get Started
@@ -56,6 +57,7 @@ export default function LandingPage() {
 
           <div className="space-x-4 md:hidden">
             <ThemeToggleButton className="mt-1" />
+
             <button
               className="cursor-pointer text-xl"
               onClick={() => setOpen(!open)}
@@ -70,9 +72,12 @@ export default function LandingPage() {
             <a href="#features">Features</a>
             <a href="#about">About</a>
             <a href="#contact">Contact</a>
+
             <hr className="border-border" />
-            <Link href="/login">Login</Link>
-            <Link href="/register">Get Started</Link>
+
+            <Link href="/auth/login">Login</Link>
+
+            <Link href="/auth/register">Get Started</Link>
           </div>
         )}
       </header>
@@ -105,12 +110,12 @@ export default function LandingPage() {
           </motion.p>
 
           <div className="flex justify-center gap-4">
-            <a
-              href="/register"
+            <Link
+              href="/auth/register"
               className="rounded-xl bg-primary px-6 py-3 text-primary-foreground transition hover:scale-105"
             >
               Get Started
-            </a>
+            </Link>
 
             <a
               href="#features"
@@ -158,6 +163,7 @@ export default function LandingPage() {
               className="rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-sm"
             >
               <h4 className="mb-2 font-semibold">{f.title}</h4>
+
               <p className="text-sm text-muted-foreground">{f.desc}</p>
             </motion.div>
           ))}
@@ -173,6 +179,7 @@ export default function LandingPage() {
           className="mx-auto max-w-3xl text-center"
         >
           <h3 className="mb-4 text-3xl font-bold">About TaskHub</h3>
+
           <p className="text-muted-foreground">
             TaskHub is a modern SaaS-style task management system built with
             Next.js and Supabase. It focuses on role-based access where users
@@ -190,9 +197,11 @@ export default function LandingPage() {
           className="mx-auto max-w-3xl text-center"
         >
           <h3 className="mb-4 text-3xl font-bold">Contact</h3>
+
           <p className="mb-6 text-muted-foreground">
             Have questions or feedback? Feel free to reach out.
           </p>
+
           <a
             href="mailto:chitkokoaung1056@gmail.com"
             className="rounded-xl bg-primary px-6 py-3 text-primary-foreground transition hover:opacity-90"
@@ -205,17 +214,20 @@ export default function LandingPage() {
       {/* ================= CTA ================= */}
       <section className="relative overflow-hidden py-24 text-center">
         <div className="absolute inset-0 bg-background" />
+
         <div className="absolute inset-0 bg-linear-to-b from-primary/10 via-background to-background" />
 
         <div className="relative mx-auto max-w-3xl px-6">
-          <h3 className="mb-4 text-3xl font-bold">Start using TaskHub today</h3>
+          <h3 className="mb-4 text-3xl font-bold">
+            Start using TaskHub today
+          </h3>
 
           <p className="mb-8 text-muted-foreground">
             Built for real-world productivity and admin control.
           </p>
 
           <Link
-            href="/register"
+            href="/auth/register"
             className="inline-flex rounded-xl bg-primary px-8 py-3 text-primary-foreground shadow-md transition hover:scale-105"
           >
             Get Started Free
@@ -231,6 +243,7 @@ export default function LandingPage() {
           <a href="/privacy">Privacy</a>
           <a href="/terms">Terms</a>
         </div>
+
         ©
         <Suspense fallback={<span>2026</span>}>
           <CurrentTime />
