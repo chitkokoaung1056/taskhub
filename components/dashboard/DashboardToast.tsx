@@ -15,11 +15,15 @@ export function DashboardToast() {
     if (!message) return
 
     if (message === "account-confirmed") {
-      toast.success("Account registered successfully!")
+      toast.success("Account confirmed successfully")
     }
 
     if (message === "password-reset-success") {
-      toast.success("Password updated successfully!")
+      toast.success("Password reset successfully")
+    }
+
+    if (message === "email-change-success") {
+      toast.success("Email updated successfully")
     }
 
     router.replace(pathname)

@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   if (token_hash && type) {
     const supabase = await createClient()
 
+    // Verifies the temporary OTP token with Supabase Auth
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash,
@@ -21,19 +22,36 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const redirectUrl = new URL(next, request.url)
 
-      // signup confirmation
-      if (type === "email") {
+      // 1. Signup / Sign-in confirmation
+      if (type === "email" || type === "signup") {
         redirectUrl.searchParams.set("message", "account-confirmed")
       }
 
-      // password recovery
+      // 2. Email update confirmation
+      if (type === "email_change") {
+        redirectUrl.searchParams.set("message", "email-change-success")
+      }
+
+      // 3. Password recovery
       if (type === "recovery") {
         redirectUrl.searchParams.set("message", "password-reset-success")
       }
 
       return NextResponse.redirect(redirectUrl)
+    } else {
+      // Log the exact validation error on the server console for easy debugging
+      console.error("Supabase Auth Verification Error:", error.message)
     }
+  } else {
+    console.error(
+      "Auth Confirmation Error: Missing token_hash or type parameters",
+      {
+        token_hash: !!token_hash,
+        type,
+      }
+    )
   }
 
+  // Fallback to error page if validation or parameters fail
   return NextResponse.redirect(new URL("/auth/error", request.url))
 }
