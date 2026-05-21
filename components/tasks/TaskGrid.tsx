@@ -2,6 +2,7 @@ import { CardContent } from "../ui/card"
 import { getTasks } from "@/lib/services/task.service"
 import { FilterOptionType, SortOptionType } from "@/lib/types/task"
 import { TaskCard } from "./TaskCard"
+import TaskDueToast from "./TaskDueToast"
 
 type TaskGridProps = {
   searchParams: Promise<{
@@ -11,17 +12,29 @@ type TaskGridProps = {
   }>
 }
 
-const TaskGrid = async ({ searchParams }: TaskGridProps) => {
+const TaskGrid = async ({
+  searchParams,
+}: TaskGridProps) => {
   const params = await searchParams
 
   const search = params.search
-  const filter = (params.filter as FilterOptionType) || "all"
-  const sort = (params.sort as SortOptionType) || "createdDate"
+  const filter =
+    (params.filter as FilterOptionType) || "all"
 
-  const tasks = await getTasks(search, filter, sort)
+  const sort =
+    (params.sort as SortOptionType) ||
+    "createdDate"
+
+  const tasks = await getTasks(
+    search,
+    filter,
+    sort
+  )
 
   return (
     <CardContent>
+      <TaskDueToast tasks={tasks} />
+
       {tasks?.length === 0 ? (
         <div className="py-12 text-center text-muted-foreground">
           No tasks found matching your filters

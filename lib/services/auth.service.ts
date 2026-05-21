@@ -1,5 +1,4 @@
 import { createClient } from "../supabase/server"
-import { getBaseUrl } from "../utils"
 
 /* -----------------------------
    AUTH ERROR MAPPER
@@ -162,14 +161,9 @@ export async function updateEmail(data: { email: string; password: string }) {
   }
 
   // update email
-  const { error: updateError } = await supabase.auth.updateUser(
-    {
-      email: data.email,
-    },
-    {
-      emailRedirectTo: `${getBaseUrl()}/auth/confirm`,
-    }
-  )
+  const { error: updateError } = await supabase.auth.updateUser({
+    email: data.email,
+  })
 
   if (updateError) {
     throw new Error("Unable to send email confirmation. Please try again")
@@ -197,9 +191,7 @@ export async function deleteAccount() {
 export async function forgotPassword(email: string) {
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${getBaseUrl()}/reset-password`,
-  })
+  const { error } = await supabase.auth.resetPasswordForEmail(email)
 
   if (error) {
     throw new Error(mapAuthError(error.message))
