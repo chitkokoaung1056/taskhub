@@ -3,7 +3,7 @@ import { createClient } from "../supabase/server"
 /* -----------------------------
    AUTH ERROR MAPPER
 ------------------------------ */
-function mapAuthError(message: string) {
+export function mapAuthError(message: string) {
   const msg = message.toLowerCase()
 
   // login errors
@@ -11,13 +11,17 @@ function mapAuthError(message: string) {
     return "Email or password is incorrect"
   }
 
-  // password issues
-  if (msg.includes("current password") || msg.includes("incorrect password")) {
-    return "Current password is incorrect"
+  // password change specific errors (MOST IMPORTANT)
+  if (msg.includes("new password should be different")) {
+    return "New password must be different from current password"
   }
 
-  if (msg.includes("password")) {
-    return "Password does not meet requirements"
+  if (msg.includes("password should be at least")) {
+    return "Password must be at least 6 characters"
+  }
+
+  if (msg.includes("current password is incorrect")) {
+    return "Current password is incorrect"
   }
 
   // email issues
@@ -203,23 +207,6 @@ export async function forgotPassword(email: string) {
 ------------------------------ */
 export async function resetPassword(newPassword: string) {
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user?.email) {
-    throw new Error("User not found")
-  }
-
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: newPassword,
-  })
-
-  if (!signInError) {
-    throw new Error("New password must be different from current password")
-  }
 
   const { error: updateError } = await supabase.auth.updateUser({
     password: newPassword,
