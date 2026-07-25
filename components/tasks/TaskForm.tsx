@@ -57,9 +57,14 @@ export default function TaskForm({
 }: TaskFormProps) {
   const [isPending, startTransition] = useTransition()
 
-  const [date, setDate] = useState<Date | undefined>(
-    formType === "edit" && task?.due_date ? new Date(task.due_date) : undefined
-  )
+  // Parse DATE as local date to avoid timezone issues
+  const [date, setDate] = useState<Date | undefined>(() => {
+    if (formType === "edit" && task?.due_date) {
+      const [year, month, day] = task.due_date.split("-").map(Number)
+      return new Date(year, month - 1, day)
+    }
+    return undefined
+  })
 
   const [errors, setErrors] = useState<TaskActionErrorType>({})
   const [formValues, setFormValues] = useState<TaskActionValuesType>({})
@@ -74,18 +79,19 @@ export default function TaskForm({
   const handleSubmit = async (formData: FormData) => {
     setErrors({})
     setFormValues({})
+
     startTransition(async () => {
       const result = await action(initialState, formData)
 
       if (result.success && result.message) {
-        toast.success(result.message?.[0])
+        toast.success(result.message[0])
         handleCancel()
       } else if (!result.success && result.errors?.general) {
-        toast.error(result.errors?.general[0])
+        toast.error(result.errors.general[0])
       }
 
       if (!result.success && result.errors) {
-        setErrors(result.errors || {})
+        setErrors(result.errors)
         setFormValues(result.values || {})
       }
     })
@@ -104,7 +110,6 @@ export default function TaskForm({
       </DialogHeader>
 
       <form action={handleSubmit} className="mt-2 space-y-5">
-        {/* Hidden field for edit mode */}
         {formType === "edit" && task?.id && (
           <input type="hidden" name="id" value={task.id} />
         )}
@@ -114,11 +119,15 @@ export default function TaskForm({
           <Input
             name="task_name"
             defaultValue={
-              formType === "edit" ? task?.task_name : formValues.task_name
+              formType === "edit"
+                ? task?.task_name
+                : formValues.task_name
             }
           />
           {errors.task_name && (
-            <p className="text-sm text-destructive">{errors.task_name[0]}</p>
+            <p className="text-sm text-destructive">
+              {errors.task_name[0]}
+            </p>
           )}
         </div>
 
@@ -145,12 +154,15 @@ export default function TaskForm({
             <Select
               name="priority"
               defaultValue={
-                formType === "edit" ? task?.priority || "medium" : "medium"
+                formType === "edit"
+                  ? task?.priority || "medium"
+                  : formValues.priority || "medium"
               }
             >
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
@@ -161,6 +173,7 @@ export default function TaskForm({
 
           <div className="w-full space-y-2">
             <Label>Status</Label>
+
             <Select
               name="status"
               defaultValue={
@@ -172,6 +185,7 @@ export default function TaskForm({
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
@@ -183,10 +197,11 @@ export default function TaskForm({
         <div className="space-y-2">
           <Label>Due Date</Label>
 
+          {/* Send DATE only (yyyy-MM-dd) */}
           <input
             type="hidden"
             name="due_date"
-            value={date ? date.toISOString() : ""}
+            value={date ? format(date, "yyyy-MM-dd") : ""}
           />
 
           <Popover>
@@ -202,12 +217,18 @@ export default function TaskForm({
             </PopoverTrigger>
 
             <PopoverContent className="w-auto p-0">
-              <Calendar mode="single" selected={date} onSelect={setDate} />
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+              />
             </PopoverContent>
           </Popover>
 
           {errors.due_date && (
-            <p className="text-sm text-destructive">{errors.due_date[0]}</p>
+            <p className="text-sm text-destructive">
+              {errors.due_date[0]}
+            </p>
           )}
         </div>
 
@@ -224,15 +245,19 @@ export default function TaskForm({
           <Button
             type="submit"
             disabled={isPending}
-            className={`${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
+            className={
+              isPending
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
+            }
           >
             {isPending
               ? formType === "add"
                 ? "Creating..."
                 : "Saving..."
               : formType === "add"
-                ? "Create Task"
-                : "Save Changes"}
+              ? "Create Task"
+              : "Save Changes"}
           </Button>
         </div>
       </form>
