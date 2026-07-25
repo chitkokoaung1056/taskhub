@@ -35,7 +35,8 @@ export default function LandingPage() {
 
   const fadeUp = {
     hidden: { opacity: 0, y: 24 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    // avoid strict easing type by only specifying duration
+    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   }
 
   const features = [
@@ -157,7 +158,7 @@ export default function LandingPage() {
       {/* ================= HERO ================= */}
       <section className="relative overflow-hidden pt-12 pb-20 md:pt-20 md:pb-32">
         {/* Soft Background Glows */}
-        <div className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-[300px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -z-10 h-75 w-125 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
 
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           <motion.div
