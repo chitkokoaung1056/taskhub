@@ -1,5 +1,10 @@
 "use client"
 
+import { useState, useTransition } from "react"
+import Link from "next/link"
+import { toast } from "sonner"
+import { KeyRound, Loader2, Send, ArrowLeft } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,11 +20,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-
-import Link from "next/link"
-import { useState, useTransition } from "react"
-import { toast } from "sonner"
-
 import { forgotPasswordAction } from "@/lib/actions/auth.action"
 import {
   ForgotPasswordErrorsType,
@@ -43,9 +43,7 @@ export default function ForgotPasswordForm({
   ...props
 }: React.ComponentProps<typeof Card>) {
   const [isPending, startTransition] = useTransition()
-
   const [errors, setErrors] = useState<ForgotPasswordErrorsType>({})
-
   const [formValues, setFormValues] = useState<ForgotPasswordValuesType>({})
 
   const clearError = (field: keyof ForgotPasswordErrorsType) => {
@@ -77,65 +75,85 @@ export default function ForgotPasswordForm({
   return (
     <Card
       {...props}
-      className="w-full border-muted/40 px-4 py-8 shadow-xl backdrop-blur supports-backdrop-filter:bg-background/70"
+      className="w-full max-w-md rounded-2xl border border-border/80 bg-card/80 p-2 sm:p-4 shadow-2xl backdrop-blur-xl supports-backdrop-filter:bg-card/60"
     >
-      {/* HEADER */}
-      <CardHeader className="mb-6 space-y-2 text-center">
-        <CardTitle className="text-2xl font-semibold tracking-tight">
-          Forgot password
-        </CardTitle>
+      {/* BRAND & HEADER */}
+      <CardHeader className="space-y-3 text-center pb-6">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-8 ring-primary/5">
+          <KeyRound className="h-6 w-6" />
+        </div>
 
-        <CardDescription className="text-sm">
-          Enter your email and we’ll send you a reset link
-        </CardDescription>
+        <div>
+          <CardTitle className="text-2xl font-bold tracking-tight">
+            Forgot password
+          </CardTitle>
+          <CardDescription className="text-sm text-muted-foreground mt-1">
+            Enter your email and we’ll send you a reset link
+          </CardDescription>
+        </div>
       </CardHeader>
 
       {/* FORM */}
       <CardContent>
-        <form action={handleForgotPassword} className="space-y-6">
-          <FieldGroup className="space-y-5">
+        <form action={handleForgotPassword} className="space-y-5">
+          <FieldGroup className="space-y-4">
             {/* EMAIL */}
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel
+                htmlFor="email"
+                className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+              >
+                Email address
+              </FieldLabel>
 
               <Input
                 id="email"
                 name="email"
+                type="email"
                 placeholder="m@example.com"
-                className="mt-2 transition focus-visible:ring-2"
+                className="mt-1.5 h-11 rounded-xl border-border/80 bg-background/50 px-3.5 transition-all focus-visible:ring-2 focus-visible:ring-primary/50"
                 defaultValue={formValues.email}
                 onChange={() => clearError("email")}
               />
 
               {errors.email && (
-                <FieldDescription className="mt-1 text-xs text-destructive">
+                <FieldDescription className="mt-1.5 text-xs font-medium text-destructive">
                   {errors.email[0]}
                 </FieldDescription>
               )}
             </Field>
           </FieldGroup>
 
-          {/* BUTTON */}
+          {/* SUBMIT BUTTON */}
           <Button
             type="submit"
             disabled={isPending}
-            className={`h-11 w-full text-sm font-medium transition-all duration-200 ${
-              isPending ? "cursor-not-allowed opacity-70" : ""
-            }`}
+            className="h-11 w-full rounded-xl bg-primary font-medium text-primary-foreground shadow-md shadow-primary/20 transition-all hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-70"
           >
-            {isPending ? "Sending reset link..." : "Send reset link"}
+            {isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Sending reset link...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                Send reset link
+                <Send className="h-4 w-4" />
+              </span>
+            )}
           </Button>
 
-          {/* FOOTER */}
-          <p className="text-center text-sm text-muted-foreground">
-            Remember your password?{" "}
+          {/* FOOTER LINK */}
+          <div className="pt-2 text-center text-sm text-muted-foreground">
+            Remembered your password?{" "}
             <Link
               href="/auth/login"
-              className="font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1 font-semibold text-primary transition hover:underline"
             >
-              Sign in
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to sign in
             </Link>
-          </p>
+          </div>
         </form>
       </CardContent>
     </Card>
